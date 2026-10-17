@@ -1,0 +1,9 @@
+langchain
+langgraph
+langchain-ollama
+pydantic
+pydantic-settings
+fastapi
+uvicorn[standard]
+httpx
+pytest

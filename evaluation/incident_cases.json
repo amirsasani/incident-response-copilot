@@ -1,0 +1,12 @@
+[
+  {
+    "incident_id": "INC-001",
+    "expected_service": "checkout-api",
+    "expected_root_cause": "Database connection pool exhaustion caused by reducing DB_POOL_MAX_SIZE",
+    "required_evidence": [
+      "log-001",
+      "metric-001",
+      "deployment-001"
+    ]
+  }
+]

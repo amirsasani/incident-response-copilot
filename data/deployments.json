@@ -1,0 +1,22 @@
+[
+  {
+    "evidence_id": "deployment-001",
+    "deployment_id": "deploy-2026-10-17-01",
+    "service": "checkout-api",
+    "version": "1.8.0",
+    "deployed_at": "2026-10-17T09:55:00Z",
+    "changes": [
+      "Changed DB_POOL_MAX_SIZE from 30 to 5"
+    ]
+  },
+  {
+    "evidence_id": "deployment-002",
+    "deployment_id": "deploy-2026-10-16-03",
+    "service": "payment-api",
+    "version": "2.4.1",
+    "deployed_at": "2026-10-16T16:30:00Z",
+    "changes": [
+      "Updated payment-provider timeout"
+    ]
+  }
+]

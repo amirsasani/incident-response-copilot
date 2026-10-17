@@ -1,0 +1,13 @@
+{
+  "incident_id": "INC-001",
+  "title": "Checkout API error-rate increase",
+  "service": "checkout-api",
+  "severity": "high",
+  "status": "investigating",
+  "started_at": "2026-10-17T10:02:00Z",
+  "symptoms": [
+    "HTTP 500 responses increased",
+    "Checkout latency increased",
+    "Database requests started timing out"
+  ]
+}

@@ -1,0 +1,4 @@
+{"evidence_id":"log-001","timestamp":"2026-10-17T10:02:11Z","service":"checkout-api","level":"ERROR","message":"Timed out while waiting for a database connection","trace_id":"trace-1001"}
+{"evidence_id":"log-002","timestamp":"2026-10-17T10:02:12Z","service":"checkout-api","level":"ERROR","message":"POST /checkout returned HTTP 500","trace_id":"trace-1001"}
+{"evidence_id":"log-003","timestamp":"2026-10-17T10:03:04Z","service":"checkout-api","level":"WARN","message":"Database connection acquisition exceeded 3000 ms","trace_id":"trace-1002"}
+{"evidence_id":"log-004","timestamp":"2026-10-17T10:04:18Z","service":"payment-api","level":"INFO","message":"Payment request completed successfully","trace_id":"trace-1003"}

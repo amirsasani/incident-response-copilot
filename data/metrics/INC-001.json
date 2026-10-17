@@ -1,0 +1,26 @@
+[
+  {
+    "evidence_id": "metric-001",
+    "timestamp": "2026-10-17T10:03:00Z",
+    "service": "checkout-api",
+    "metric": "database_pool_utilization",
+    "value": 100,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-002",
+    "timestamp": "2026-10-17T10:03:00Z",
+    "service": "checkout-api",
+    "metric": "http_5xx_rate",
+    "value": 31,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-003",
+    "timestamp": "2026-10-17T10:03:00Z",
+    "service": "checkout-api",
+    "metric": "request_latency_p95",
+    "value": 4800,
+    "unit": "milliseconds"
+  }
+]
