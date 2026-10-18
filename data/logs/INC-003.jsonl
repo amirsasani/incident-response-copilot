@@ -1,0 +1,4 @@
+{"evidence_id":"log-009","timestamp":"2026-10-18T16:10:12Z","service":"notification-worker","level":"WARN","message":"Notification queue depth reached 18500 messages and continues to increase","trace_id":"trace-3001"}
+{"evidence_id":"log-010","timestamp":"2026-10-18T16:10:45Z","service":"notification-worker","level":"ERROR","message":"Notification processing delay exceeded the 300 second service-level objective","trace_id":"trace-3002"}
+{"evidence_id":"log-011","timestamp":"2026-10-18T16:11:03Z","service":"notification-worker","level":"WARN","message":"Only 2 consumer threads are active; the normal configured concurrency is 20","trace_id":"trace-3003"}
+{"evidence_id":"log-012","timestamp":"2026-10-18T16:11:20Z","service":"notification-api","level":"INFO","message":"Notification request accepted and added to the queue","trace_id":"trace-3004"}

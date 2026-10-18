@@ -17,6 +17,13 @@ def test_load_memory_leak_incident():
     assert incident["severity"] == "high"
 
 
+def test_load_queue_backlog_incident():
+    incident = load_incident("INC-003")
+
+    assert incident["service"] == "notification-worker"
+    assert incident["title"] == "Notification delivery backlog"
+
+
 def test_load_incident_rejects_invalid_id():
     with pytest.raises(ValueError, match="Invalid incident ID"):
         load_incident("../INC-001")

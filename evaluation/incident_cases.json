@@ -18,5 +18,15 @@
       "metric-004",
       "deployment-003"
     ]
+  },
+  {
+    "incident_id": "INC-003",
+    "expected_service": "notification-worker",
+    "expected_root_cause": "Version 2.7.0 reduced consumer concurrency from 20 to 2, causing insufficient throughput and a notification queue backlog",
+    "required_evidence": [
+      "log-011",
+      "metric-008",
+      "deployment-005"
+    ]
   }
 ]

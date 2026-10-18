@@ -41,6 +41,17 @@ def test_search_logs_finds_memory_pressure():
     assert len(results) == 1
     assert results[0]["evidence_id"] == "log-005"
 
+
+def test_search_logs_finds_reduced_consumer_count():
+    results = search_logs.invoke({
+        "incident_id": "INC-003",
+        "service": "notification-worker",
+        "query": "consumer",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "log-011"
+
 def test_get_metrics_finds_pool_utilization():
     results = get_metrics.invoke({
         "incident_id": "INC-001",
@@ -73,6 +84,18 @@ def test_get_metrics_finds_heap_utilization():
     assert results[0]["evidence_id"] == "metric-005"
     assert results[0]["value"] == 96
 
+
+def test_get_metrics_finds_queue_depth():
+    results = get_metrics.invoke({
+        "incident_id": "INC-003",
+        "service": "notification-worker",
+        "metric_name": "queue_depth",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "metric-008"
+    assert results[0]["value"] == 18500
+
 def test_get_recent_deployments_finds_checkout_deployment():
     results = get_recent_deployments.invoke({
         "service": "checkout-api",
@@ -103,6 +126,17 @@ def test_get_recent_deployments_finds_cache_change():
     assert results[0]["evidence_id"] == "deployment-003"
     assert results[0]["version"] == "3.2.0"
 
+
+def test_get_recent_deployments_finds_concurrency_change():
+    results = get_recent_deployments.invoke({
+        "service": "notification-worker",
+        "before": "2026-10-18T16:10:00Z",
+    })
+
+    assert len(results) == 2
+    assert results[0]["evidence_id"] == "deployment-005"
+    assert results[0]["version"] == "2.7.0"
+
 def test_search_runbooks_finds_database_runbook():
     results = search_runbooks.invoke({
         "query": "database connection timeout",
@@ -128,3 +162,12 @@ def test_search_runbooks_finds_memory_leak_runbook():
 
     assert results[0]["evidence_id"] == "runbook-memory-001"
     assert results[0]["title"] == "Application memory leaks"
+
+
+def test_search_runbooks_finds_queue_backlog_runbook():
+    results = search_runbooks.invoke({
+        "query": "notification queue backlog consumer throughput",
+    })
+
+    assert results[0]["evidence_id"] == "runbook-queue-001"
+    assert results[0]["title"] == "Message queue backlogs"

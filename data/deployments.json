@@ -38,5 +38,25 @@
     "changes": [
       "Updated recommendation ranking weights"
     ]
+  },
+  {
+    "evidence_id": "deployment-005",
+    "deployment_id": "deploy-2026-10-18-04",
+    "service": "notification-worker",
+    "version": "2.7.0",
+    "deployed_at": "2026-10-18T15:45:00Z",
+    "changes": [
+      "Reduced NOTIFICATION_CONSUMER_CONCURRENCY from 20 to 2"
+    ]
+  },
+  {
+    "evidence_id": "deployment-006",
+    "deployment_id": "deploy-2026-10-17-07",
+    "service": "notification-worker",
+    "version": "2.6.3",
+    "deployed_at": "2026-10-17T12:15:00Z",
+    "changes": [
+      "Added delivery metrics for notification providers"
+    ]
   }
 ]
