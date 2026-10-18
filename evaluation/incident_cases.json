@@ -3,6 +3,11 @@
     "incident_id": "INC-001",
     "expected_service": "checkout-api",
     "expected_root_cause": "Database connection pool exhaustion caused by reducing DB_POOL_MAX_SIZE",
+    "root_cause_keywords": [
+      "database",
+      "connection pool",
+      "db_pool_max_size"
+    ],
     "required_evidence": [
       "log-001",
       "metric-001",
@@ -13,6 +18,11 @@
     "incident_id": "INC-002",
     "expected_service": "recommendation-api",
     "expected_root_cause": "An unbounded in-memory response cache introduced in version 3.2.0 caused application memory exhaustion",
+    "root_cause_keywords": [
+      "memory",
+      "cache",
+      "unbounded"
+    ],
     "required_evidence": [
       "log-005",
       "metric-004",
@@ -23,6 +33,11 @@
     "incident_id": "INC-003",
     "expected_service": "notification-worker",
     "expected_root_cause": "Version 2.7.0 reduced consumer concurrency from 20 to 2, causing insufficient throughput and a notification queue backlog",
+    "root_cause_keywords": [
+      "deployment",
+      "throughput",
+      "queue"
+    ],
     "required_evidence": [
       "log-011",
       "metric-008",
@@ -33,6 +48,11 @@
     "incident_id": "INC-004",
     "expected_service": "payment-api",
     "expected_root_cause": "Version 2.5.0 configured an invalid payment-provider hostname, causing DNS failures and an upstream dependency outage",
+    "root_cause_keywords": [
+      "payment",
+      "provider",
+      "dns"
+    ],
     "required_evidence": [
       "log-013",
       "metric-012",
@@ -43,6 +63,11 @@
     "incident_id": "INC-005",
     "expected_service": "search-indexer",
     "expected_root_cause": "Version 4.6.0 disabled temporary index-file cleanup, exhausting disk capacity and causing index writes to fail",
+    "root_cause_keywords": [
+      "disk",
+      "cleanup",
+      "space"
+    ],
     "required_evidence": [
       "log-017",
       "metric-016",

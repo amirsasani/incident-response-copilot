@@ -6,6 +6,8 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
+from langchain_core.messages import AIMessage
+
 from src.agent.graph import build_incident_graph
 from src.config import OLLAMA_MODEL, PROJECT_ROOT
 
@@ -41,7 +43,7 @@ def load_cases(path: Path) -> list[dict]:
     if not isinstance(cases, list) or not cases:
         raise ValueError("Evaluation cases must contain a non-empty list.")
 
-    required_fields = {"incident_id", "expected_service", "expected_root_cause", "required_evidence"}
+    required_fields = {"incident_id", "expected_service", "expected_root_cause", "root_cause_keywords", "required_evidence"}
 
     for case in cases:
         missing_fields = required_fields - set(case)
@@ -51,6 +53,9 @@ def load_cases(path: Path) -> list[dict]:
 
         if not isinstance(case["required_evidence"], list) or not case["required_evidence"]:
             raise ValueError(f"Evaluation case {case['incident_id']} must define required evidence.")
+
+        if not isinstance(case["root_cause_keywords"], list) or not case["root_cause_keywords"]:
+            raise ValueError(f"Evaluation case {case['incident_id']} must define root-cause keywords.")
 
     return cases
 
@@ -76,6 +81,16 @@ def root_cause_token_f1(expected: str, actual: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
+def normalize_text(text: str) -> str:
+    return " ".join(TOKEN_PATTERN.findall(text.casefold().replace("_", " ")))
+
+
+def root_cause_keyword_recall(keywords: list[str], actual: str) -> float:
+    normalized_actual = normalize_text(actual)
+    matched_keywords = sum(normalize_text(keyword) in normalized_actual for keyword in keywords)
+    return matched_keywords / len(keywords) if keywords else 0.0
+
+
 def create_initial_state(incident_id: str) -> dict:
     return {
         "messages": [],
@@ -89,7 +104,7 @@ def create_initial_state(incident_id: str) -> dict:
 
 
 def handle_timeout(signum, frame):
-    raise EvaluationTimeoutError("Investigation exceeded its time limit.")
+    raise EvaluationTimeoutError("Evaluation exceeded its time limit.")
 
 
 @contextmanager
@@ -108,15 +123,44 @@ def time_limit(seconds: int):
         signal.signal(signal.SIGALRM, previous_handler)
 
 
+def report_generation_is_next(state: dict) -> bool:
+    messages = state.get("messages", [])
+
+    if state.get("report") is not None or not messages:
+        return False
+
+    last_message = messages[-1]
+    return isinstance(last_message, AIMessage) and not last_message.tool_calls
+
+
+def phase_timings(started_at: float, report_started_at: float | None, finished_at: float) -> tuple[float, float]:
+    if report_started_at is None:
+        return finished_at - started_at, 0.0
+
+    return report_started_at - started_at, finished_at - report_started_at
+
+
 def evaluate_case(graph, case: dict, root_cause_threshold: float, timeout_seconds: int) -> dict:
     incident_id = case["incident_id"]
     started_at = time.perf_counter()
+    report_started_at = None
+    state = create_initial_state(incident_id)
 
     try:
         with time_limit(timeout_seconds):
-            state = graph.invoke(create_initial_state(incident_id), config={"recursion_limit": 30})
+            for streamed_state in graph.stream(state, config={"recursion_limit": 30}, stream_mode="values"):
+                state = streamed_state
+
+                if report_started_at is None and report_generation_is_next(state):
+                    report_started_at = time.perf_counter()
 
         report = state["report"]
+
+        if report is None:
+            raise RuntimeError("The graph completed without generating a report.")
+
+        finished_at = time.perf_counter()
+        investigation_seconds, report_generation_seconds = phase_timings(started_at, report_started_at, finished_at)
         collected_evidence_ids = {evidence.evidence_id for evidence in state["collected_evidence"]}
         cited_evidence_ids = set(report.evidence)
         required_evidence_ids = set(case["required_evidence"])
@@ -124,6 +168,7 @@ def evaluate_case(graph, case: dict, root_cause_threshold: float, timeout_second
         found_required_evidence = cited_evidence_ids & required_evidence_ids
         evidence_recall = len(found_required_evidence) / len(required_evidence_ids)
         root_cause_f1 = root_cause_token_f1(case["expected_root_cause"], report.root_cause)
+        root_cause_recall = root_cause_keyword_recall(case["root_cause_keywords"], report.root_cause)
 
         return {
             "incident_id": incident_id,
@@ -133,18 +178,26 @@ def evaluate_case(graph, case: dict, root_cause_threshold: float, timeout_second
             "service_correct": report.affected_service == case["expected_service"],
             "expected_root_cause": case["expected_root_cause"],
             "actual_root_cause": report.root_cause,
+            "root_cause_keywords": case["root_cause_keywords"],
+            "root_cause_keyword_recall": round(root_cause_recall, 3),
             "root_cause_token_f1": round(root_cause_f1, 3),
-            "root_cause_match": root_cause_f1 >= root_cause_threshold,
+            "root_cause_match": root_cause_recall >= root_cause_threshold,
             "required_evidence": sorted(required_evidence_ids),
             "cited_evidence": sorted(cited_evidence_ids),
             "missing_required_evidence": sorted(required_evidence_ids - cited_evidence_ids),
             "invalid_evidence": sorted(invalid_evidence_ids),
             "required_evidence_recall": round(evidence_recall, 3),
             "tool_call_count": state["tool_call_count"],
-            "latency_seconds": round(time.perf_counter() - started_at, 3),
+            "investigation_seconds": round(investigation_seconds, 3),
+            "report_generation_seconds": round(report_generation_seconds, 3),
+            "latency_seconds": round(finished_at - started_at, 3),
+            "failure_phase": None,
             "error": None,
         }
     except Exception as error:
+        finished_at = time.perf_counter()
+        investigation_seconds, report_generation_seconds = phase_timings(started_at, report_started_at, finished_at)
+
         return {
             "incident_id": incident_id,
             "status": "failed",
@@ -153,6 +206,8 @@ def evaluate_case(graph, case: dict, root_cause_threshold: float, timeout_second
             "service_correct": False,
             "expected_root_cause": case["expected_root_cause"],
             "actual_root_cause": None,
+            "root_cause_keywords": case["root_cause_keywords"],
+            "root_cause_keyword_recall": 0.0,
             "root_cause_token_f1": 0.0,
             "root_cause_match": False,
             "required_evidence": sorted(case["required_evidence"]),
@@ -160,8 +215,11 @@ def evaluate_case(graph, case: dict, root_cause_threshold: float, timeout_second
             "missing_required_evidence": sorted(case["required_evidence"]),
             "invalid_evidence": [],
             "required_evidence_recall": 0.0,
-            "tool_call_count": 0,
-            "latency_seconds": round(time.perf_counter() - started_at, 3),
+            "tool_call_count": state.get("tool_call_count", 0),
+            "investigation_seconds": round(investigation_seconds, 3),
+            "report_generation_seconds": round(report_generation_seconds, 3),
+            "latency_seconds": round(finished_at - started_at, 3),
+            "failure_phase": "report_generation" if report_started_at is not None else "investigation",
             "error": f"{type(error).__name__}: {error}",
         }
 
@@ -179,12 +237,15 @@ def summarize_results(case_results: list[dict], root_cause_threshold: float) -> 
         "incidents_completed": len(completed),
         "completion_rate": round(len(completed) / case_count, 3),
         "service_accuracy": round(sum(result["service_correct"] for result in case_results) / case_count, 3),
-        "root_cause_match_threshold": root_cause_threshold,
+        "root_cause_keyword_recall_threshold": round(root_cause_threshold, 3),
         "root_cause_match_rate": round(sum(result["root_cause_match"] for result in case_results) / case_count, 3),
+        "average_root_cause_keyword_recall": round(sum(result["root_cause_keyword_recall"] for result in case_results) / case_count, 3),
         "average_root_cause_token_f1": round(sum(result["root_cause_token_f1"] for result in case_results) / case_count, 3),
         "required_evidence_recall": round(sum(result["required_evidence_recall"] for result in case_results) / case_count, 3),
         "invalid_citation_rate": round(invalid_citations / total_citations, 3) if total_citations else 0.0,
         "average_tool_calls": round(sum(result["tool_call_count"] for result in case_results) / case_count, 3),
+        "average_investigation_seconds": round(sum(result["investigation_seconds"] for result in completed) / len(completed), 3) if completed else 0.0,
+        "average_report_generation_seconds": round(sum(result["report_generation_seconds"] for result in completed) / len(completed), 3) if completed else 0.0,
         "average_latency_seconds": round(sum(result["latency_seconds"] for result in case_results) / case_count, 3),
         "failures": [result["incident_id"] for result in case_results if result["status"] == "failed"],
         "cases": case_results,
@@ -209,7 +270,7 @@ def main():
     parser.add_argument("--cases_file", type=Path, default=CASES_FILE)
     parser.add_argument("--output_file", type=Path, default=OUTPUT_FILE)
     parser.add_argument("--incident_id", action="append")
-    parser.add_argument("--root_cause_threshold", type=float, default=0.3)
+    parser.add_argument("--root_cause_threshold", type=float, default=2 / 3)
     parser.add_argument("--timeout_seconds", type=int, default=240)
     args = parser.parse_args()
 

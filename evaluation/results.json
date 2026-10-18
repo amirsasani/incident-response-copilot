@@ -1,0 +1,209 @@
+{
+  "method": "LangGraph tools + Ollama structured report",
+  "model": "qwen3.5:4b",
+  "incidents_evaluated": 5,
+  "incidents_completed": 5,
+  "completion_rate": 1.0,
+  "service_accuracy": 1.0,
+  "root_cause_keyword_recall_threshold": 0.667,
+  "root_cause_match_rate": 0.6,
+  "average_root_cause_keyword_recall": 0.6,
+  "average_root_cause_token_f1": 0.442,
+  "required_evidence_recall": 0.333,
+  "invalid_citation_rate": 0.0,
+  "average_tool_calls": 6.6,
+  "average_investigation_seconds": 23.206,
+  "average_report_generation_seconds": 6.363,
+  "average_latency_seconds": 29.569,
+  "failures": [],
+  "cases": [
+    {
+      "incident_id": "INC-001",
+      "status": "completed",
+      "expected_service": "checkout-api",
+      "actual_service": "checkout-api",
+      "service_correct": true,
+      "expected_root_cause": "Database connection pool exhaustion caused by reducing DB_POOL_MAX_SIZE",
+      "actual_root_cause": "Configuration change reducing database connection pool size below operational requirements, causing resource saturation and subsequent diagnostic errors.",
+      "root_cause_keywords": [
+        "database",
+        "connection pool",
+        "db_pool_max_size"
+      ],
+      "root_cause_keyword_recall": 0.667,
+      "root_cause_token_f1": 0.348,
+      "root_cause_match": true,
+      "required_evidence": [
+        "deployment-001",
+        "log-001",
+        "metric-001"
+      ],
+      "cited_evidence": [
+        "deployment-001",
+        "runbook-db-001"
+      ],
+      "missing_required_evidence": [
+        "log-001",
+        "metric-001"
+      ],
+      "invalid_evidence": [],
+      "required_evidence_recall": 0.333,
+      "tool_call_count": 8,
+      "investigation_seconds": 14.551,
+      "report_generation_seconds": 3.584,
+      "latency_seconds": 18.135,
+      "failure_phase": null,
+      "error": null
+    },
+    {
+      "incident_id": "INC-002",
+      "status": "completed",
+      "expected_service": "recommendation-api",
+      "actual_service": "recommendation-api",
+      "service_correct": true,
+      "expected_root_cause": "An unbounded in-memory response cache introduced in version 3.2.0 caused application memory exhaustion",
+      "actual_root_cause": "Deployment of version 3.2.0 introduced an in-memory cache without size or expiration limits, causing unbounded memory growth.",
+      "root_cause_keywords": [
+        "memory",
+        "cache",
+        "unbounded"
+      ],
+      "root_cause_keyword_recall": 1.0,
+      "root_cause_token_f1": 0.571,
+      "root_cause_match": true,
+      "required_evidence": [
+        "deployment-003",
+        "log-005",
+        "metric-004"
+      ],
+      "cited_evidence": [
+        "deployment-003"
+      ],
+      "missing_required_evidence": [
+        "log-005",
+        "metric-004"
+      ],
+      "invalid_evidence": [],
+      "required_evidence_recall": 0.333,
+      "tool_call_count": 6,
+      "investigation_seconds": 24.583,
+      "report_generation_seconds": 6.467,
+      "latency_seconds": 31.05,
+      "failure_phase": null,
+      "error": null
+    },
+    {
+      "incident_id": "INC-003",
+      "status": "completed",
+      "expected_service": "notification-worker",
+      "actual_service": "notification-worker",
+      "service_correct": true,
+      "expected_root_cause": "Version 2.7.0 reduced consumer concurrency from 20 to 2, causing insufficient throughput and a notification queue backlog",
+      "actual_root_cause": "Deployment of version 2.7.0 reduced consumer concurrency, causing resource saturation and diagnostic errors.",
+      "root_cause_keywords": [
+        "deployment",
+        "throughput",
+        "queue"
+      ],
+      "root_cause_keyword_recall": 0.333,
+      "root_cause_token_f1": 0.593,
+      "root_cause_match": false,
+      "required_evidence": [
+        "deployment-005",
+        "log-011",
+        "metric-008"
+      ],
+      "cited_evidence": [
+        "deployment-005",
+        "runbook-queue-001"
+      ],
+      "missing_required_evidence": [
+        "log-011",
+        "metric-008"
+      ],
+      "invalid_evidence": [],
+      "required_evidence_recall": 0.333,
+      "tool_call_count": 6,
+      "investigation_seconds": 23.289,
+      "report_generation_seconds": 6.427,
+      "latency_seconds": 29.716,
+      "failure_phase": null,
+      "error": null
+    },
+    {
+      "incident_id": "INC-004",
+      "status": "completed",
+      "expected_service": "payment-api",
+      "actual_service": "payment-api",
+      "service_correct": true,
+      "expected_root_cause": "Version 2.5.0 configured an invalid payment-provider hostname, causing DNS failures and an upstream dependency outage",
+      "actual_root_cause": "Configuration change in deployment-007 altered the payment provider endpoint to an invalid address, causing upstream dependency outages.",
+      "root_cause_keywords": [
+        "payment",
+        "provider",
+        "dns"
+      ],
+      "root_cause_keyword_recall": 0.667,
+      "root_cause_token_f1": 0.414,
+      "root_cause_match": true,
+      "required_evidence": [
+        "deployment-007",
+        "log-013",
+        "metric-012"
+      ],
+      "cited_evidence": [
+        "deployment-007",
+        "runbook-dependency-001"
+      ],
+      "missing_required_evidence": [
+        "log-013",
+        "metric-012"
+      ],
+      "invalid_evidence": [],
+      "required_evidence_recall": 0.333,
+      "tool_call_count": 6,
+      "investigation_seconds": 25.663,
+      "report_generation_seconds": 8.548,
+      "latency_seconds": 34.211,
+      "failure_phase": null,
+      "error": null
+    },
+    {
+      "incident_id": "INC-005",
+      "status": "completed",
+      "expected_service": "search-indexer",
+      "actual_service": "search-indexer",
+      "service_correct": true,
+      "expected_root_cause": "Version 4.6.0 disabled temporary index-file cleanup, exhausting disk capacity and causing index writes to fail",
+      "actual_root_cause": "Configuration change preventing temporary file cleanup",
+      "root_cause_keywords": [
+        "disk",
+        "cleanup",
+        "space"
+      ],
+      "root_cause_keyword_recall": 0.333,
+      "root_cause_token_f1": 0.286,
+      "root_cause_match": false,
+      "required_evidence": [
+        "deployment-008",
+        "log-017",
+        "metric-016"
+      ],
+      "cited_evidence": [
+        "deployment-008"
+      ],
+      "missing_required_evidence": [
+        "log-017",
+        "metric-016"
+      ],
+      "invalid_evidence": [],
+      "required_evidence_recall": 0.333,
+      "tool_call_count": 7,
+      "investigation_seconds": 27.945,
+      "report_generation_seconds": 6.788,
+      "latency_seconds": 34.733,
+      "failure_phase": null,
+      "error": null
+    }
+  ]
+}

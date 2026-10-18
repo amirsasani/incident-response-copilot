@@ -17,7 +17,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Validate report evidence against collected tool results
 - [x] Add isolated tool and graph tests
 - [x] Add a five-incident labelled evaluation dataset
-- [ ] Evaluate root-cause accuracy and evidence recall
+- [x] Evaluate root-cause accuracy and evidence recall
 - [ ] Expose investigations through a FastAPI service
 - [ ] Add human approval before remediation actions
 - [ ] Add tracing and workflow observability
@@ -120,6 +120,9 @@ The default configuration is:
 ```dotenv
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen3.5:4b
+OLLAMA_REASONING=false
+OLLAMA_NUM_PREDICT=512
+OLLAMA_KEEP_ALIVE=30m
 MAX_TOOL_CALLS=8
 ```
 
@@ -199,13 +202,32 @@ The evaluator measures:
 
 - completion rate;
 - affected-service accuracy;
-- lexical root-cause match rate and token F1;
+- labelled root-cause concept recall and match rate;
+- lexical token F1 as a diagnostic metric;
 - required evidence recall;
 - invalid citation rate;
-- investigation latency;
+- investigation, report-generation and total latency;
 - average tool-call count.
 
-Root-cause matching is currently a transparent lexical baseline with a default token-F1 threshold of `0.3`. It should be complemented by human review or a separately validated semantic judge before treating it as a production-quality accuracy measurement.
+Root-cause matching uses three labelled keywords or phrases for each incident. A report passes when it covers at least two of the three concepts. Token F1 is retained as a diagnostic measure of wording overlap. These automated scores should still be complemented by human review before treating them as production-quality accuracy measurements.
+
+### Baseline results
+
+Results from one local run over the five synthetic incidents using `qwen3.5:4b`:
+
+| Metric | Result |
+|---|---:|
+| Completion rate | 1.000 |
+| Affected-service accuracy | 1.000 |
+| Root-cause match rate | 0.600 |
+| Average root-cause concept recall | 0.600 |
+| Required evidence recall | 0.333 |
+| Invalid citation rate | 0.000 |
+| Average investigation time | 23.206 s |
+| Average report-generation time | 6.363 s |
+| Average total latency | 29.569 s |
+
+The baseline completes every case and identifies the affected service reliably. Required evidence recall is the clearest area for improvement.
 
 ## Safety design
 
@@ -221,7 +243,7 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Roadmap
 
-1. Implement automated evaluation for root-cause accuracy and evidence recall.
+1. Improve required evidence recall through stronger evidence selection.
 2. Add FastAPI endpoints for starting and retrieving investigations.
 3. Add LangSmith or OpenTelemetry tracing.
 4. Integrate realistic observability adapters for systems such as Prometheus, Loki and Kubernetes.
