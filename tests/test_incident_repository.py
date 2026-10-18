@@ -31,6 +31,13 @@ def test_load_dependency_outage_incident():
     assert incident["severity"] == "critical"
 
 
+def test_load_disk_saturation_incident():
+    incident = load_incident("INC-005")
+
+    assert incident["service"] == "search-indexer"
+    assert incident["title"] == "Search indexer disk exhaustion"
+
+
 def test_load_incident_rejects_invalid_id():
     with pytest.raises(ValueError, match="Invalid incident ID"):
         load_incident("../INC-001")

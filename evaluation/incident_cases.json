@@ -38,5 +38,15 @@
       "metric-012",
       "deployment-007"
     ]
+  },
+  {
+    "incident_id": "INC-005",
+    "expected_service": "search-indexer",
+    "expected_root_cause": "Version 4.6.0 disabled temporary index-file cleanup, exhausting disk capacity and causing index writes to fail",
+    "required_evidence": [
+      "log-017",
+      "metric-016",
+      "deployment-008"
+    ]
   }
 ]

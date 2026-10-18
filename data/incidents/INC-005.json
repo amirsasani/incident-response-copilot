@@ -1,0 +1,14 @@
+{
+  "incident_id": "INC-005",
+  "title": "Search indexer disk exhaustion",
+  "service": "search-indexer",
+  "severity": "high",
+  "status": "investigating",
+  "started_at": "2026-10-18T19:05:00Z",
+  "symptoms": [
+    "Search indexing batches failed",
+    "Index segment write latency increased",
+    "The indexer filesystem reached full utilization",
+    "New documents stopped appearing in search results"
+  ]
+}

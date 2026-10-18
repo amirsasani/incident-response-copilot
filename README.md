@@ -16,7 +16,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Generate structured incident reports with Ollama
 - [x] Validate report evidence against collected tool results
 - [x] Add isolated tool and graph tests
-- [ ] Add a larger labelled evaluation dataset
+- [x] Add a five-incident labelled evaluation dataset
 - [ ] Evaluate root-cause accuracy and evidence recall
 - [ ] Expose investigations through a FastAPI service
 - [ ] Add human approval before remediation actions
@@ -196,7 +196,7 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Limitations
 
-- The current dataset contains four synthetic incidents.
+- The current dataset contains five synthetic incidents.
 - Retrieval tools operate on local fixture files rather than production observability systems.
 - Small local models may select weaker evidence even when stronger evidence is available.
 - Investigation latency depends on the local model and hardware.
@@ -204,12 +204,11 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Roadmap
 
-1. Add incidents covering failed deployments and disk saturation.
-2. Implement automated evaluation for root-cause accuracy and evidence recall.
-3. Add FastAPI endpoints for starting and retrieving investigations.
-4. Add LangSmith or OpenTelemetry tracing.
-5. Integrate realistic observability adapters for systems such as Prometheus, Loki and Kubernetes.
-6. Add checkpointing and human approval before remediation.
+1. Implement automated evaluation for root-cause accuracy and evidence recall.
+2. Add FastAPI endpoints for starting and retrieving investigations.
+3. Add LangSmith or OpenTelemetry tracing.
+4. Integrate realistic observability adapters for systems such as Prometheus, Loki and Kubernetes.
+5. Add checkpointing and human approval before remediation.
 
 ## License
 

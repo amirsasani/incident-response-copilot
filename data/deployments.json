@@ -68,5 +68,25 @@
     "changes": [
       "Changed PAYMENT_PROVIDER_BASE_URL from api.payment-provider.example to api.payment-provider.invalid"
     ]
+  },
+  {
+    "evidence_id": "deployment-008",
+    "deployment_id": "deploy-2026-10-18-08",
+    "service": "search-indexer",
+    "version": "4.6.0",
+    "deployed_at": "2026-10-18T18:40:00Z",
+    "changes": [
+      "Set INDEX_TEMP_FILE_CLEANUP=false while debugging index generation"
+    ]
+  },
+  {
+    "evidence_id": "deployment-009",
+    "deployment_id": "deploy-2026-10-17-09",
+    "service": "search-indexer",
+    "version": "4.5.2",
+    "deployed_at": "2026-10-17T10:20:00Z",
+    "changes": [
+      "Optimized indexing batch size"
+    ]
   }
 ]

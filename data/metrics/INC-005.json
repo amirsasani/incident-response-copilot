@@ -1,0 +1,34 @@
+[
+  {
+    "evidence_id": "metric-016",
+    "timestamp": "2026-10-18T19:06:00Z",
+    "service": "search-indexer",
+    "metric": "filesystem_utilization",
+    "value": 100,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-017",
+    "timestamp": "2026-10-18T19:06:00Z",
+    "service": "search-indexer",
+    "metric": "available_disk_bytes",
+    "value": 0,
+    "unit": "bytes"
+  },
+  {
+    "evidence_id": "metric-018",
+    "timestamp": "2026-10-18T19:06:00Z",
+    "service": "search-indexer",
+    "metric": "index_write_latency_p95",
+    "value": 2400,
+    "unit": "milliseconds"
+  },
+  {
+    "evidence_id": "metric-019",
+    "timestamp": "2026-10-18T19:06:00Z",
+    "service": "search-indexer",
+    "metric": "temporary_index_file_count",
+    "value": 128000,
+    "unit": "files"
+  }
+]

@@ -63,6 +63,17 @@ def test_search_logs_finds_dependency_dns_failure():
     assert len(results) == 1
     assert results[0]["evidence_id"] == "log-013"
 
+
+def test_search_logs_finds_disk_exhaustion():
+    results = search_logs.invoke({
+        "incident_id": "INC-005",
+        "service": "search-indexer",
+        "query": "No space left",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "log-017"
+
 def test_get_metrics_finds_pool_utilization():
     results = get_metrics.invoke({
         "incident_id": "INC-001",
@@ -119,6 +130,18 @@ def test_get_metrics_finds_provider_error_rate():
     assert results[0]["evidence_id"] == "metric-012"
     assert results[0]["value"] == 98
 
+
+def test_get_metrics_finds_filesystem_utilization():
+    results = get_metrics.invoke({
+        "incident_id": "INC-005",
+        "service": "search-indexer",
+        "metric_name": "filesystem_utilization",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "metric-016"
+    assert results[0]["value"] == 100
+
 def test_get_recent_deployments_finds_checkout_deployment():
     results = get_recent_deployments.invoke({
         "service": "checkout-api",
@@ -171,6 +194,17 @@ def test_get_recent_deployments_finds_provider_endpoint_change():
     assert results[0]["evidence_id"] == "deployment-007"
     assert results[0]["version"] == "2.5.0"
 
+
+def test_get_recent_deployments_finds_cleanup_change():
+    results = get_recent_deployments.invoke({
+        "service": "search-indexer",
+        "before": "2026-10-18T19:05:00Z",
+    })
+
+    assert len(results) == 2
+    assert results[0]["evidence_id"] == "deployment-008"
+    assert results[0]["version"] == "4.6.0"
+
 def test_search_runbooks_finds_database_runbook():
     results = search_runbooks.invoke({
         "query": "database connection timeout",
@@ -213,3 +247,12 @@ def test_search_runbooks_finds_dependency_outage_runbook():
 
     assert results[0]["evidence_id"] == "runbook-dependency-001"
     assert results[0]["title"] == "Upstream dependency outages"
+
+
+def test_search_runbooks_finds_disk_saturation_runbook():
+    results = search_runbooks.invoke({
+        "query": "disk filesystem no space temporary files cleanup",
+    })
+
+    assert results[0]["evidence_id"] == "runbook-disk-001"
+    assert results[0]["title"] == "Disk saturation"

@@ -1,0 +1,4 @@
+{"evidence_id":"log-017","timestamp":"2026-10-18T19:05:11Z","service":"search-indexer","level":"ERROR","message":"Failed to write index segment: No space left on device","trace_id":"trace-5001"}
+{"evidence_id":"log-018","timestamp":"2026-10-18T19:05:28Z","service":"search-indexer","level":"WARN","message":"Temporary index directory contains 95 GB of files and automatic cleanup is disabled","trace_id":"trace-5002"}
+{"evidence_id":"log-019","timestamp":"2026-10-18T19:06:02Z","service":"search-indexer","level":"ERROR","message":"Indexing batch failed while flushing temporary segment files","trace_id":"trace-5003"}
+{"evidence_id":"log-020","timestamp":"2026-10-18T19:06:20Z","service":"search-api","level":"INFO","message":"Existing search index served successfully","trace_id":"trace-5004"}
