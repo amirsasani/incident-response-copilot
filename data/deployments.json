@@ -18,5 +18,25 @@
     "changes": [
       "Updated payment-provider timeout"
     ]
+  },
+  {
+    "evidence_id": "deployment-003",
+    "deployment_id": "deploy-2026-10-18-02",
+    "service": "recommendation-api",
+    "version": "3.2.0",
+    "deployed_at": "2026-10-18T13:55:00Z",
+    "changes": [
+      "Enabled an in-memory recommendation response cache without a maximum size or expiration"
+    ]
+  },
+  {
+    "evidence_id": "deployment-004",
+    "deployment_id": "deploy-2026-10-16-05",
+    "service": "recommendation-api",
+    "version": "3.1.4",
+    "deployed_at": "2026-10-16T11:30:00Z",
+    "changes": [
+      "Updated recommendation ranking weights"
+    ]
   }
 ]

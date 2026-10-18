@@ -196,7 +196,7 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Limitations
 
-- The current dataset contains one synthetic incident.
+- The current dataset contains two synthetic incidents.
 - Retrieval tools operate on local fixture files rather than production observability systems.
 - Small local models may select weaker evidence even when stronger evidence is available.
 - Investigation latency depends on the local model and hardware.
@@ -204,7 +204,7 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Roadmap
 
-1. Add incidents covering memory leaks, failed deployments, queue backlogs and dependency outages.
+1. Add incidents covering failed deployments, queue backlogs and dependency outages.
 2. Implement automated evaluation for root-cause accuracy and evidence recall.
 3. Add FastAPI endpoints for starting and retrieving investigations.
 4. Add LangSmith or OpenTelemetry tracing.

@@ -10,6 +10,13 @@ def test_load_incident_returns_incident_data():
     assert incident["service"] == "checkout-api"
 
 
+def test_load_memory_leak_incident():
+    incident = load_incident("INC-002")
+
+    assert incident["service"] == "recommendation-api"
+    assert incident["severity"] == "high"
+
+
 def test_load_incident_rejects_invalid_id():
     with pytest.raises(ValueError, match="Invalid incident ID"):
         load_incident("../INC-001")

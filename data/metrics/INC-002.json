@@ -1,0 +1,34 @@
+[
+  {
+    "evidence_id": "metric-004",
+    "timestamp": "2026-10-18T14:21:00Z",
+    "service": "recommendation-api",
+    "metric": "process_memory_rss",
+    "value": 1950,
+    "unit": "megabytes"
+  },
+  {
+    "evidence_id": "metric-005",
+    "timestamp": "2026-10-18T14:21:00Z",
+    "service": "recommendation-api",
+    "metric": "jvm_heap_utilization",
+    "value": 96,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-006",
+    "timestamp": "2026-10-18T14:21:00Z",
+    "service": "recommendation-api",
+    "metric": "gc_pause_p95",
+    "value": 850,
+    "unit": "milliseconds"
+  },
+  {
+    "evidence_id": "metric-007",
+    "timestamp": "2026-10-18T14:21:00Z",
+    "service": "recommendation-api",
+    "metric": "container_restart_count",
+    "value": 3,
+    "unit": "restarts"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "incident_id": "INC-002",
+  "title": "Recommendation API memory growth",
+  "service": "recommendation-api",
+  "severity": "high",
+  "status": "investigating",
+  "started_at": "2026-10-18T14:20:00Z",
+  "symptoms": [
+    "Container memory usage increased continuously",
+    "Garbage-collection pauses increased",
+    "Recommendation requests started timing out",
+    "Application containers restarted after exceeding their memory limit"
+  ]
+}

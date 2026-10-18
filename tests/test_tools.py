@@ -30,6 +30,17 @@ def test_search_logs_filters_by_service():
     assert len(results) == 1
     assert results[0]["evidence_id"] == "log-004"
 
+
+def test_search_logs_finds_memory_pressure():
+    results = search_logs.invoke({
+        "incident_id": "INC-002",
+        "service": "recommendation-api",
+        "query": "heap",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "log-005"
+
 def test_get_metrics_finds_pool_utilization():
     results = get_metrics.invoke({
         "incident_id": "INC-001",
@@ -50,6 +61,18 @@ def test_get_metrics_filters_by_service():
 
     assert len(results) == 3
 
+
+def test_get_metrics_finds_heap_utilization():
+    results = get_metrics.invoke({
+        "incident_id": "INC-002",
+        "service": "recommendation-api",
+        "metric_name": "heap_utilization",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "metric-005"
+    assert results[0]["value"] == 96
+
 def test_get_recent_deployments_finds_checkout_deployment():
     results = get_recent_deployments.invoke({
         "service": "checkout-api",
@@ -69,6 +92,17 @@ def test_get_recent_deployments_respects_before_timestamp():
 
     assert results == []
 
+
+def test_get_recent_deployments_finds_cache_change():
+    results = get_recent_deployments.invoke({
+        "service": "recommendation-api",
+        "before": "2026-10-18T14:20:00Z",
+    })
+
+    assert len(results) == 2
+    assert results[0]["evidence_id"] == "deployment-003"
+    assert results[0]["version"] == "3.2.0"
+
 def test_search_runbooks_finds_database_runbook():
     results = search_runbooks.invoke({
         "query": "database connection timeout",
@@ -85,3 +119,12 @@ def test_search_runbooks_returns_empty_for_unrelated_query():
     })
 
     assert results == []
+
+
+def test_search_runbooks_finds_memory_leak_runbook():
+    results = search_runbooks.invoke({
+        "query": "memory leak heap garbage collection",
+    })
+
+    assert results[0]["evidence_id"] == "runbook-memory-001"
+    assert results[0]["title"] == "Application memory leaks"

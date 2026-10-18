@@ -1,0 +1,4 @@
+{"evidence_id":"log-005","timestamp":"2026-10-18T14:20:14Z","service":"recommendation-api","level":"WARN","message":"JVM heap utilization reached 96 percent and remained high after full garbage collection","trace_id":"trace-2001"}
+{"evidence_id":"log-006","timestamp":"2026-10-18T14:21:03Z","service":"recommendation-api","level":"ERROR","message":"Recommendation worker exceeded the container memory limit and was terminated","trace_id":"trace-2002"}
+{"evidence_id":"log-007","timestamp":"2026-10-18T14:21:10Z","service":"recommendation-api","level":"ERROR","message":"GET /recommendations timed out after 5000 ms","trace_id":"trace-2003"}
+{"evidence_id":"log-008","timestamp":"2026-10-18T14:22:00Z","service":"catalog-api","level":"INFO","message":"Catalog request completed successfully","trace_id":"trace-2004"}

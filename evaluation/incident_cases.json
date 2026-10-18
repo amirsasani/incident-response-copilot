@@ -8,5 +8,15 @@
       "metric-001",
       "deployment-001"
     ]
+  },
+  {
+    "incident_id": "INC-002",
+    "expected_service": "recommendation-api",
+    "expected_root_cause": "An unbounded in-memory response cache introduced in version 3.2.0 caused application memory exhaustion",
+    "required_evidence": [
+      "log-005",
+      "metric-004",
+      "deployment-003"
+    ]
   }
 ]
