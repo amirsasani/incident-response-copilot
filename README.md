@@ -181,14 +181,31 @@ The tests cover:
 
 `evaluation/incident_cases.json` contains labelled incidents with an expected service, root cause and required evidence IDs.
 
-The planned evaluation will measure:
+Run a single incident first:
 
-- root-cause accuracy;
+```bash
+python -m scripts.evaluate_agent --incident_id INC-001
+```
+
+Run the complete evaluation set:
+
+```bash
+python -m scripts.evaluate_agent
+```
+
+Detailed results are written to `evaluation/results.json`. Each incident has a default four-minute timeout, which can be changed with `--timeout_seconds`.
+
+The evaluator measures:
+
+- completion rate;
+- affected-service accuracy;
+- lexical root-cause match rate and token F1;
 - required evidence recall;
 - invalid citation rate;
 - investigation latency;
-- unnecessary tool calls;
-- human-review decisions.
+- average tool-call count.
+
+Root-cause matching is currently a transparent lexical baseline with a default token-F1 threshold of `0.3`. It should be complemented by human review or a separately validated semantic judge before treating it as a production-quality accuracy measurement.
 
 ## Safety design
 
