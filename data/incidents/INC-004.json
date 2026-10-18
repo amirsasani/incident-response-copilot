@@ -1,0 +1,14 @@
+{
+  "incident_id": "INC-004",
+  "title": "Payment provider connectivity failure",
+  "service": "payment-api",
+  "severity": "critical",
+  "status": "investigating",
+  "started_at": "2026-10-18T17:42:00Z",
+  "symptoms": [
+    "Payment authorization requests failed",
+    "Requests to the external payment provider timed out",
+    "The payment-provider circuit breaker opened",
+    "Checkout completion rate dropped sharply"
+  ]
+}

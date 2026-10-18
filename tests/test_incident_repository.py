@@ -24,6 +24,13 @@ def test_load_queue_backlog_incident():
     assert incident["title"] == "Notification delivery backlog"
 
 
+def test_load_dependency_outage_incident():
+    incident = load_incident("INC-004")
+
+    assert incident["service"] == "payment-api"
+    assert incident["severity"] == "critical"
+
+
 def test_load_incident_rejects_invalid_id():
     with pytest.raises(ValueError, match="Invalid incident ID"):
         load_incident("../INC-001")

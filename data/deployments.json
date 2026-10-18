@@ -58,5 +58,15 @@
     "changes": [
       "Added delivery metrics for notification providers"
     ]
+  },
+  {
+    "evidence_id": "deployment-007",
+    "deployment_id": "deploy-2026-10-18-06",
+    "service": "payment-api",
+    "version": "2.5.0",
+    "deployed_at": "2026-10-18T17:30:00Z",
+    "changes": [
+      "Changed PAYMENT_PROVIDER_BASE_URL from api.payment-provider.example to api.payment-provider.invalid"
+    ]
   }
 ]

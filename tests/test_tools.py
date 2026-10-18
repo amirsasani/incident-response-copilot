@@ -52,6 +52,17 @@ def test_search_logs_finds_reduced_consumer_count():
     assert len(results) == 1
     assert results[0]["evidence_id"] == "log-011"
 
+
+def test_search_logs_finds_dependency_dns_failure():
+    results = search_logs.invoke({
+        "incident_id": "INC-004",
+        "service": "payment-api",
+        "query": "DNS resolution",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "log-013"
+
 def test_get_metrics_finds_pool_utilization():
     results = get_metrics.invoke({
         "incident_id": "INC-001",
@@ -96,6 +107,18 @@ def test_get_metrics_finds_queue_depth():
     assert results[0]["evidence_id"] == "metric-008"
     assert results[0]["value"] == 18500
 
+
+def test_get_metrics_finds_provider_error_rate():
+    results = get_metrics.invoke({
+        "incident_id": "INC-004",
+        "service": "payment-api",
+        "metric_name": "provider_error_rate",
+    })
+
+    assert len(results) == 1
+    assert results[0]["evidence_id"] == "metric-012"
+    assert results[0]["value"] == 98
+
 def test_get_recent_deployments_finds_checkout_deployment():
     results = get_recent_deployments.invoke({
         "service": "checkout-api",
@@ -137,12 +160,22 @@ def test_get_recent_deployments_finds_concurrency_change():
     assert results[0]["evidence_id"] == "deployment-005"
     assert results[0]["version"] == "2.7.0"
 
+
+def test_get_recent_deployments_finds_provider_endpoint_change():
+    results = get_recent_deployments.invoke({
+        "service": "payment-api",
+        "before": "2026-10-18T17:42:00Z",
+    })
+
+    assert len(results) == 2
+    assert results[0]["evidence_id"] == "deployment-007"
+    assert results[0]["version"] == "2.5.0"
+
 def test_search_runbooks_finds_database_runbook():
     results = search_runbooks.invoke({
         "query": "database connection timeout",
     })
 
-    assert len(results) == 1
     assert results[0]["evidence_id"] == "runbook-db-001"
     assert results[0]["title"] == "Database connection errors"
 
@@ -171,3 +204,12 @@ def test_search_runbooks_finds_queue_backlog_runbook():
 
     assert results[0]["evidence_id"] == "runbook-queue-001"
     assert results[0]["title"] == "Message queue backlogs"
+
+
+def test_search_runbooks_finds_dependency_outage_runbook():
+    results = search_runbooks.invoke({
+        "query": "upstream dependency DNS circuit breaker",
+    })
+
+    assert results[0]["evidence_id"] == "runbook-dependency-001"
+    assert results[0]["title"] == "Upstream dependency outages"

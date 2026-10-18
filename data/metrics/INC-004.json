@@ -1,0 +1,34 @@
+[
+  {
+    "evidence_id": "metric-012",
+    "timestamp": "2026-10-18T17:43:00Z",
+    "service": "payment-api",
+    "metric": "payment_provider_error_rate",
+    "value": 98,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-013",
+    "timestamp": "2026-10-18T17:43:00Z",
+    "service": "payment-api",
+    "metric": "payment_provider_timeout_rate",
+    "value": 76,
+    "unit": "percent"
+  },
+  {
+    "evidence_id": "metric-014",
+    "timestamp": "2026-10-18T17:43:00Z",
+    "service": "payment-api",
+    "metric": "payment_provider_circuit_breaker_open",
+    "value": 1,
+    "unit": "state"
+  },
+  {
+    "evidence_id": "metric-015",
+    "timestamp": "2026-10-18T17:43:00Z",
+    "service": "payment-api",
+    "metric": "payment_success_rate",
+    "value": 2,
+    "unit": "percent"
+  }
+]

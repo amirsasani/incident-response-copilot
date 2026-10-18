@@ -28,5 +28,15 @@
       "metric-008",
       "deployment-005"
     ]
+  },
+  {
+    "incident_id": "INC-004",
+    "expected_service": "payment-api",
+    "expected_root_cause": "Version 2.5.0 configured an invalid payment-provider hostname, causing DNS failures and an upstream dependency outage",
+    "required_evidence": [
+      "log-013",
+      "metric-012",
+      "deployment-007"
+    ]
   }
 ]

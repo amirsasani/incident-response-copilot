@@ -1,0 +1,4 @@
+{"evidence_id":"log-013","timestamp":"2026-10-18T17:42:09Z","service":"payment-api","level":"ERROR","message":"DNS resolution failed for api.payment-provider.invalid","trace_id":"trace-4001"}
+{"evidence_id":"log-014","timestamp":"2026-10-18T17:42:32Z","service":"payment-api","level":"WARN","message":"Payment-provider circuit breaker opened after 50 consecutive connection failures","trace_id":"trace-4002"}
+{"evidence_id":"log-015","timestamp":"2026-10-18T17:43:01Z","service":"payment-api","level":"ERROR","message":"POST /payments/authorize returned HTTP 503 because the upstream provider was unavailable","trace_id":"trace-4003"}
+{"evidence_id":"log-016","timestamp":"2026-10-18T17:43:18Z","service":"checkout-api","level":"INFO","message":"Checkout request paused while payment authorization is pending","trace_id":"trace-4004"}
