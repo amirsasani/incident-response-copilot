@@ -19,6 +19,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Add a five-incident labelled evaluation dataset
 - [x] Evaluate root-cause accuracy and evidence recall
 - [x] Import and investigate an external RCAEval RE2 case
+- [x] Evaluate a balanced 12-case RCAEval subset
 - [x] Add distributed-trace search
 - [ ] Expose investigations through a FastAPI service
 - [ ] Add human approval before remediation actions
@@ -73,9 +74,13 @@ incident-response-copilot/
 │   ├── runbooks/           # Operational runbooks
 │   └── deployments.json    # Deployment history
 ├── evaluation/
-│   └── incident_cases.json # Labelled evaluation cases
+│   ├── incident_cases.json # Synthetic labelled cases
+│   ├── rcaeval_cases.json  # Balanced external benchmark manifest
+│   └── rcaeval_results.json
 ├── scripts/
 │   ├── import_rcaeval.py   # Case-at-a-time RCAEval importer
+│   ├── import_rcaeval_batch.py
+│   ├── evaluate_rcaeval.py
 │   └── investigate.py      # CLI entry point
 ├── src/
 │   ├── agent/
@@ -173,26 +178,46 @@ Example output:
 
 Results can vary between local model runs. Every returned evidence ID is checked against evidence collected during that investigation.
 
-## External RCAEval case
+## External RCAEval evaluation
 
-The project can download one labelled [RCAEval](https://github.com/phamquiluan/RCAEval) RE2 case at a time from [Hugging Face](https://huggingface.co/datasets/phamquiluan/RCAEval). This avoids downloading the complete dataset.
+The project evaluates against a balanced 12-case subset of [RCAEval](https://github.com/phamquiluan/RCAEval) RE2 Online Boutique data from [Hugging Face](https://huggingface.co/datasets/phamquiluan/RCAEval). The manifest contains two cases for each fault type: CPU, delay, disk, packet loss, memory and socket faults. It covers five root-cause services.
 
-Import the default Online Boutique CPU incident:
-
-```bash
-python -m scripts.import_rcaeval
-```
-
-Run the imported incident:
+Download and normalize the 12 cases:
 
 ```bash
-python -m scripts.investigate \
-  --incident_id RCAEVAL-RE2OB-CHECKOUTSERVICE-CPU-1
+python -m scripts.import_rcaeval_batch
 ```
 
-The importer downloads a pinned dataset revision and converts the source Parquet files into bounded, agent-ready logs, metric anomaly summaries and trace spans. Ground-truth labels remain in a separate `labels.json` file and are never included in the agent prompt. Downloaded and normalized benchmark data is excluded from Git.
+Run a one-case smoke test before the full evaluation:
 
-In the verified local run, the agent correctly identified `checkoutservice` and a CPU utilization anomaly, citing `rcaeval-metric-001`.
+```bash
+python -m scripts.evaluate_rcaeval --limit 1
+```
+
+Run all 12 cases:
+
+```bash
+python -m scripts.evaluate_rcaeval
+```
+
+The importer downloads a pinned dataset revision and converts each case into bounded, agent-ready logs, metric anomaly summaries and trace spans. Ground-truth labels remain in separate `labels.json` files and are never included in the agent prompt. Downloaded and normalized telemetry is excluded from Git. Detailed evaluation output is written to `evaluation/rcaeval_results.json`.
+
+### RCAEval baseline results
+
+Results from one local run using `qwen3.5:4b`:
+
+| Metric | Result |
+|---|---:|
+| Cases | 12 |
+| Completion rate | 0.417 |
+| Root-cause service accuracy | 0.333 |
+| Fault-type accuracy | 0.333 |
+| Joint service and fault accuracy | 0.250 |
+| Valid evidence rate | 0.417 |
+| Average tool calls | 3.833 |
+| Average latency | 26.710 s |
+
+The agent performs well on the selected CPU cases but often ends an investigation without collecting evidence for harder fault types. This external baseline exposes the main improvement target: more reliable tool use and evidence collection across delay, packet-loss, memory and socket incidents.
 
 ## Tests
 
@@ -207,6 +232,7 @@ The tests cover:
 - incident loading and input validation;
 - filtering logs and metrics;
 - importing RCAEval telemetry and searching distributed traces;
+- validating the balanced RCAEval manifest, batch importer and evaluator;
 - deployment time filtering;
 - runbook retrieval;
 - Pydantic state validation;
@@ -268,7 +294,7 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Limitations
 
-- The automated benchmark currently covers five synthetic incidents and one manually verified RCAEval case.
+- The automated benchmarks cover five synthetic incidents and a balanced 12-case RCAEval subset; this remains too small for production claims.
 - Retrieval tools operate on local files rather than production observability systems.
 - Small local models may select weaker evidence even when stronger evidence is available.
 - Investigation latency depends on the local model and hardware.
@@ -276,8 +302,9 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Roadmap
 
-1. Expand RCAEval evaluation to 10–20 cases and report service and fault-type accuracy.
+1. Improve external-case tool use and evidence collection, especially for memory, packet-loss and socket faults.
 2. Improve required evidence recall through stronger evidence selection.
+3. Expose investigations through a FastAPI service.
 3. Add FastAPI endpoints for starting and retrieving investigations.
 4. Add LangSmith or OpenTelemetry tracing.
 5. Add checkpointing and human approval before remediation.

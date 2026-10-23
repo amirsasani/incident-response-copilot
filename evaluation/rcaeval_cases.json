@@ -1,0 +1,74 @@
+[
+  {
+    "case": "re2ob_checkoutservice_cpu_1",
+    "incident_id": "RCAEVAL-RE2OB-CHECKOUTSERVICE-CPU-1",
+    "expected_service": "checkoutservice",
+    "expected_fault": "cpu"
+  },
+  {
+    "case": "re2ob_currencyservice_cpu_2",
+    "incident_id": "RCAEVAL-RE2OB-CURRENCYSERVICE-CPU-2",
+    "expected_service": "currencyservice",
+    "expected_fault": "cpu"
+  },
+  {
+    "case": "re2ob_emailservice_delay_1",
+    "incident_id": "RCAEVAL-RE2OB-EMAILSERVICE-DELAY-1",
+    "expected_service": "emailservice",
+    "expected_fault": "delay"
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_2",
+    "incident_id": "RCAEVAL-RE2OB-PRODUCTCATALOGSERVICE-DELAY-2",
+    "expected_service": "productcatalogservice",
+    "expected_fault": "delay"
+  },
+  {
+    "case": "re2ob_recommendationservice_disk_1",
+    "incident_id": "RCAEVAL-RE2OB-RECOMMENDATIONSERVICE-DISK-1",
+    "expected_service": "recommendationservice",
+    "expected_fault": "disk"
+  },
+  {
+    "case": "re2ob_checkoutservice_disk_2",
+    "incident_id": "RCAEVAL-RE2OB-CHECKOUTSERVICE-DISK-2",
+    "expected_service": "checkoutservice",
+    "expected_fault": "disk"
+  },
+  {
+    "case": "re2ob_currencyservice_loss_1",
+    "incident_id": "RCAEVAL-RE2OB-CURRENCYSERVICE-LOSS-1",
+    "expected_service": "currencyservice",
+    "expected_fault": "loss"
+  },
+  {
+    "case": "re2ob_emailservice_loss_2",
+    "incident_id": "RCAEVAL-RE2OB-EMAILSERVICE-LOSS-2",
+    "expected_service": "emailservice",
+    "expected_fault": "loss"
+  },
+  {
+    "case": "re2ob_productcatalogservice_mem_1",
+    "incident_id": "RCAEVAL-RE2OB-PRODUCTCATALOGSERVICE-MEM-1",
+    "expected_service": "productcatalogservice",
+    "expected_fault": "mem"
+  },
+  {
+    "case": "re2ob_recommendationservice_mem_2",
+    "incident_id": "RCAEVAL-RE2OB-RECOMMENDATIONSERVICE-MEM-2",
+    "expected_service": "recommendationservice",
+    "expected_fault": "mem"
+  },
+  {
+    "case": "re2ob_checkoutservice_socket_3",
+    "incident_id": "RCAEVAL-RE2OB-CHECKOUTSERVICE-SOCKET-3",
+    "expected_service": "checkoutservice",
+    "expected_fault": "socket"
+  },
+  {
+    "case": "re2ob_currencyservice_socket_3",
+    "incident_id": "RCAEVAL-RE2OB-CURRENCYSERVICE-SOCKET-3",
+    "expected_service": "currencyservice",
+    "expected_fault": "socket"
+  }
+]
