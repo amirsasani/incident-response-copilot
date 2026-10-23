@@ -6,7 +6,7 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel, Field
 
 
-EvidenceType = Literal["log", "metric", "deployment", "runbook"]
+EvidenceType = Literal["log", "metric", "trace", "deployment", "runbook"]
 
 
 class Evidence(BaseModel):

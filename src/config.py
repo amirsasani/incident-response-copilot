@@ -10,7 +10,9 @@ INCIDENTS_PATH = DATA_PATH / "incidents"
 LOGS_PATH = DATA_PATH / "logs"
 METRICS_PATH = DATA_PATH / "metrics"
 RUNBOOKS_PATH = DATA_PATH / "runbooks"
+TRACES_PATH = DATA_PATH / "traces"
 DEPLOYMENTS_FILE = DATA_PATH / "deployments.json"
+EXTERNAL_RCAEVAL_PATH = DATA_PATH / "external" / "rcaeval"
 
 
 class Settings(BaseSettings):

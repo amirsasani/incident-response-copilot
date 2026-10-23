@@ -7,3 +7,6 @@ fastapi
 uvicorn[standard]
 httpx
 pytest
+huggingface_hub
+pandas
+pyarrow

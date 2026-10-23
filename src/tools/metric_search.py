@@ -1,19 +1,12 @@
 import json
-import re
 
 from langchain_core.tools import tool
 
-from src.config import METRICS_PATH
-
-
-INCIDENT_ID_PATTERN = re.compile(r"^INC-\d+$")
+from src.incidents.storage import get_incident_data_file
 
 
 def load_metrics(incident_id: str) -> list[dict]:
-    if not INCIDENT_ID_PATTERN.fullmatch(incident_id):
-        raise ValueError("Invalid incident ID.")
-
-    metrics_file = METRICS_PATH / f"{incident_id}.json"
+    metrics_file = get_incident_data_file(incident_id, "metrics")
 
     if not metrics_file.exists():
         raise FileNotFoundError(f"No metrics found for incident {incident_id}.")

@@ -1,6 +1,6 @@
 # Incident Response Copilot
 
-An evidence-based incident investigation agent built with LangChain and LangGraph. It correlates logs, metrics, deployments and operational runbooks, then produces a structured root-cause report with traceable evidence IDs.
+An evidence-based incident investigation agent built with LangChain and LangGraph. It correlates logs, metrics, distributed traces, deployments and operational runbooks, then produces a structured root-cause report with traceable evidence IDs.
 
 The project demonstrates how an AI agent can support site reliability and platform teams while keeping conclusions grounded in observable system data.
 
@@ -18,6 +18,8 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Add isolated tool and graph tests
 - [x] Add a five-incident labelled evaluation dataset
 - [x] Evaluate root-cause accuracy and evidence recall
+- [x] Import and investigate an external RCAEval RE2 case
+- [x] Add distributed-trace search
 - [ ] Expose investigations through a FastAPI service
 - [ ] Add human approval before remediation actions
 - [ ] Add tracing and workflow observability
@@ -31,12 +33,14 @@ flowchart LR
     C --> D{Tool calls required?}
     D -->|Yes| E[Logs]
     D -->|Yes| F[Metrics]
-    D -->|Yes| G[Deployments]
-    D -->|Yes| H[Runbooks]
+    D -->|Yes| G[Traces]
+    D -->|Yes| H[Deployments]
+    D -->|Yes| L[Runbooks]
     E --> I[Collect evidence]
     F --> I
     G --> I
     H --> I
+    L --> I
     I --> C
     D -->|No| J[Structured report]
     J --> K[Evidence validation]
@@ -65,24 +69,29 @@ incident-response-copilot/
 │   ├── incidents/          # Incident descriptions
 │   ├── logs/               # JSON Lines application logs
 │   ├── metrics/            # Time-series metric samples
+│   ├── external/           # Locally imported public benchmark data
 │   ├── runbooks/           # Operational runbooks
 │   └── deployments.json    # Deployment history
 ├── evaluation/
 │   └── incident_cases.json # Labelled evaluation cases
 ├── scripts/
+│   ├── import_rcaeval.py   # Case-at-a-time RCAEval importer
 │   └── investigate.py      # CLI entry point
 ├── src/
 │   ├── agent/
 │   │   ├── graph.py        # LangGraph workflow
 │   │   ├── nodes.py        # Investigation and report nodes
 │   │   └── state.py        # Typed state and report schemas
+│   ├── datasets/
+│   │   └── rcaeval.py      # Download and normalization adapter
 │   ├── incidents/
 │   │   └── repository.py   # Incident loader
 │   ├── tools/
 │   │   ├── deployment_search.py
 │   │   ├── log_search.py
 │   │   ├── metric_search.py
-│   │   └── runbook_search.py
+│   │   ├── runbook_search.py
+│   │   └── trace_search.py
 │   └── config.py
 └── tests/
 ```
@@ -93,6 +102,8 @@ incident-response-copilot/
 - LangChain
 - LangGraph
 - Ollama and `ChatOllama`
+- RCAEval
+- Pandas and PyArrow
 - Pydantic
 - Pytest
 
@@ -162,6 +173,27 @@ Example output:
 
 Results can vary between local model runs. Every returned evidence ID is checked against evidence collected during that investigation.
 
+## External RCAEval case
+
+The project can download one labelled [RCAEval](https://github.com/phamquiluan/RCAEval) RE2 case at a time from [Hugging Face](https://huggingface.co/datasets/phamquiluan/RCAEval). This avoids downloading the complete dataset.
+
+Import the default Online Boutique CPU incident:
+
+```bash
+python -m scripts.import_rcaeval
+```
+
+Run the imported incident:
+
+```bash
+python -m scripts.investigate \
+  --incident_id RCAEVAL-RE2OB-CHECKOUTSERVICE-CPU-1
+```
+
+The importer downloads a pinned dataset revision and converts the source Parquet files into bounded, agent-ready logs, metric anomaly summaries and trace spans. Ground-truth labels remain in a separate `labels.json` file and are never included in the agent prompt. Downloaded and normalized benchmark data is excluded from Git.
+
+In the verified local run, the agent correctly identified `checkoutservice` and a CPU utilization anomaly, citing `rcaeval-metric-001`.
+
 ## Tests
 
 Run the test suite with:
@@ -174,6 +206,7 @@ The tests cover:
 
 - incident loading and input validation;
 - filtering logs and metrics;
+- importing RCAEval telemetry and searching distributed traces;
 - deployment time filtering;
 - runbook retrieval;
 - Pydantic state validation;
@@ -235,18 +268,18 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Limitations
 
-- The current dataset contains five synthetic incidents.
-- Retrieval tools operate on local fixture files rather than production observability systems.
+- The automated benchmark currently covers five synthetic incidents and one manually verified RCAEval case.
+- Retrieval tools operate on local files rather than production observability systems.
 - Small local models may select weaker evidence even when stronger evidence is available.
 - Investigation latency depends on the local model and hardware.
 - The project currently provides a CLI and does not expose an HTTP API or graphical interface.
 
 ## Roadmap
 
-1. Improve required evidence recall through stronger evidence selection.
-2. Add FastAPI endpoints for starting and retrieving investigations.
-3. Add LangSmith or OpenTelemetry tracing.
-4. Integrate realistic observability adapters for systems such as Prometheus, Loki and Kubernetes.
+1. Expand RCAEval evaluation to 10–20 cases and report service and fault-type accuracy.
+2. Improve required evidence recall through stronger evidence selection.
+3. Add FastAPI endpoints for starting and retrieving investigations.
+4. Add LangSmith or OpenTelemetry tracing.
 5. Add checkpointing and human approval before remediation.
 
 ## License

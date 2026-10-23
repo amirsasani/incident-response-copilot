@@ -8,11 +8,13 @@ from src.tools.deployment_search import get_recent_deployments
 from src.tools.log_search import search_logs
 from src.tools.metric_search import get_metrics
 from src.tools.runbook_search import search_runbooks
+from src.tools.trace_search import search_traces
 
 
 TOOLS = [
     search_logs,
     get_metrics,
+    search_traces,
     get_recent_deployments,
     search_runbooks,
 ]
@@ -20,21 +22,24 @@ TOOLS = [
 TOOL_EVIDENCE_TYPES = {
     "search_logs": "log",
     "get_metrics": "metric",
+    "search_traces": "trace",
     "get_recent_deployments": "deployment",
     "search_runbooks": "runbook",
 }
 
-SYSTEM_PROMPT = """
+DEFAULT_EVIDENCE_SOURCES = ["logs", "metrics", "deployments", "runbooks"]
+
+
+def create_system_prompt(incident: dict) -> str:
+    evidence_sources = incident.get("available_evidence", DEFAULT_EVIDENCE_SOURCES)
+    source_list = "\n".join(f"- {source}" for source in evidence_sources)
+    return f"""
 You are an incident-response investigator.
 
-Investigate the incident using the available tools. Before finishing, inspect:
-- logs;
-- metrics;
-- deployments before the incident;
-- relevant runbooks.
+Investigate the incident using the available tools. You must call the appropriate tool for every available evidence source before finishing:
+{source_list}
 
-Base every conclusion on tool evidence. Do not invent evidence IDs.
-When sufficient evidence has been collected, provide a short factual synthesis.
+Do not call tools for evidence sources that are not listed. Begin by collecting evidence, even when the incident description is generic. Base every conclusion on tool evidence and do not invent evidence IDs. When sufficient evidence has been collected, provide a short factual synthesis.
 """.strip()
 
 
@@ -44,7 +49,7 @@ def load_incident_node(state: IncidentState) -> dict:
     return {
         "incident": incident,
         "messages": [
-            SystemMessage(content=SYSTEM_PROMPT),
+            SystemMessage(content=create_system_prompt(incident)),
             HumanMessage(content=f"Investigate this incident:\n{json.dumps(incident, indent=2)}"),
         ],
         "collected_evidence": [],
@@ -62,6 +67,11 @@ def create_investigation_node(model, max_tool_calls: int):
             return {"messages": [AIMessage(content="The tool-call limit has been reached. Generate the report from the collected evidence.")]}
 
         response = model_with_tools.invoke(state["messages"])
+
+        if not response.tool_calls and not state["collected_evidence"]:
+            retry_messages = [*state["messages"], response, HumanMessage(content="No evidence has been collected. Call the tools for the incident's listed evidence sources now; do not provide a conclusion yet.")]
+            response = model_with_tools.invoke(retry_messages)
+
         return {"messages": [response]}
 
     return investigate
@@ -77,6 +87,9 @@ def create_summary(item: dict, evidence_type: str) -> str:
     if evidence_type == "deployment":
         changes = ", ".join(item.get("changes", []))
         return f"Version {item.get('version')} was deployed. Changes: {changes}"
+
+    if evidence_type == "trace":
+        return f"{item.get('service')} {item.get('operation')} returned status {item.get('status_code')} with duration {item.get('duration')}."
 
     return item.get("title", "Runbook evidence.")
 
@@ -143,7 +156,7 @@ def create_report_node(model):
         }
 
         messages = [
-            SystemMessage(content="Generate an incident report using only the supplied evidence. Cite the strongest evidence for each part of the causal chain: diagnostic errors, resource saturation and the triggering deployment. Prefer direct diagnostic evidence over generic symptoms. The evidence field must contain only valid evidence IDs from the supplied evidence."),
+            SystemMessage(content="Generate an incident report using only the supplied evidence. Cite the strongest relevant evidence across the available evidence types and prefer direct diagnostic evidence over generic symptoms. The evidence field must contain only valid evidence IDs from the supplied evidence."),
             HumanMessage(content=json.dumps(context, indent=2)),
         ]
 

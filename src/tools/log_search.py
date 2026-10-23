@@ -1,19 +1,12 @@
 import json
-import re
 
 from langchain_core.tools import tool
 
-from src.config import LOGS_PATH
-
-
-INCIDENT_ID_PATTERN = re.compile(r"^INC-\d+$")
+from src.incidents.storage import get_incident_data_file
 
 
 def load_logs(incident_id: str) -> list[dict]:
-    if not INCIDENT_ID_PATTERN.fullmatch(incident_id):
-        raise ValueError("Invalid incident ID.")
-
-    log_file = LOGS_PATH / f"{incident_id}.jsonl"
+    log_file = get_incident_data_file(incident_id, "logs")
 
     if not log_file.exists():
         raise FileNotFoundError(f"No logs found for incident {incident_id}.")

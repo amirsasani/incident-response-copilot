@@ -1,17 +1,10 @@
 import json
-import re
 
-from src.config import INCIDENTS_PATH
-
-
-INCIDENT_ID_PATTERN = re.compile(r"^INC-\d+$")
+from src.incidents.storage import get_incident_data_file
 
 
 def load_incident(incident_id: str) -> dict:
-    if not INCIDENT_ID_PATTERN.fullmatch(incident_id):
-        raise ValueError("Invalid incident ID.")
-
-    incident_file = INCIDENTS_PATH / f"{incident_id}.json"
+    incident_file = get_incident_data_file(incident_id, "incident")
 
     if not incident_file.exists():
         raise FileNotFoundError(f"Incident does not exist: {incident_id}")
