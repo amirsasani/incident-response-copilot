@@ -68,6 +68,19 @@ class FakeModel:
         return FakeReportModel()
 
 
+class FakeNoToolInvestigationModel:
+    def invoke(self, messages):
+        return AIMessage(content="No tool calls were selected.")
+
+
+class FakeNoToolModel:
+    def bind_tools(self, tools):
+        return FakeNoToolInvestigationModel()
+
+    def with_structured_output(self, schema, method="json_schema"):
+        return FakeReportModel()
+
+
 def test_incident_graph_collects_evidence_and_generates_report():
     graph = build_incident_graph(model=FakeModel())
     initial_state = {
@@ -87,3 +100,24 @@ def test_incident_graph_collects_evidence_and_generates_report():
     assert result["report"].affected_service == "checkout-api"
     assert result["tool_call_count"] == 4
     assert {"log-001", "metric-001", "deployment-001"}.issubset(evidence_ids)
+
+
+def test_incident_graph_falls_back_when_model_does_not_call_tools():
+    graph = build_incident_graph(model=FakeNoToolModel())
+    initial_state = {
+        "messages": [],
+        "incident_id": "INC-001",
+        "incident": {},
+        "collected_evidence": [],
+        "report": None,
+        "tool_call_count": 0,
+        "errors": [],
+    }
+
+    result = graph.invoke(initial_state, config={"recursion_limit": 30})
+    evidence_ids = {evidence.evidence_id for evidence in result["collected_evidence"]}
+
+    assert result["report"].incident_id == "INC-001"
+    assert result["tool_call_count"] == 4
+    assert {"log-001", "metric-001", "deployment-001", "runbook-db-001"}.issubset(evidence_ids)
+    assert result["errors"] == []

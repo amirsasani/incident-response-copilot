@@ -15,6 +15,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Build a LangGraph tool-calling workflow
 - [x] Generate structured incident reports with Ollama
 - [x] Validate report evidence against collected tool results
+- [x] Add deterministic evidence collection when the model skips tool calls
 - [x] Add isolated tool and graph tests
 - [x] Add a five-incident labelled evaluation dataset
 - [x] Evaluate root-cause accuracy and evidence recall
@@ -47,7 +48,7 @@ flowchart LR
     J --> K[Evidence validation]
 ```
 
-The investigator receives the incident metadata and decides which tools to call. LangGraph executes those tools, adds their results to the conversation and stores normalized evidence in the shared state. When the investigation is complete, a separate structured-output call creates an `IncidentReport`.
+The investigator receives the incident metadata and decides which tools to call. LangGraph executes those tools, adds their results to the conversation and stores normalized evidence in the shared state. If the model returns no tool calls, a bounded fallback collects the incident's declared evidence sources before report generation. When the investigation is complete, a separate structured-output call creates an `IncidentReport`.
 
 The final report is rejected if it references an evidence ID that was not returned by a tool.
 
@@ -209,15 +210,15 @@ Results from one local run using `qwen3.5:4b`:
 | Metric | Result |
 |---|---:|
 | Cases | 12 |
-| Completion rate | 0.417 |
-| Root-cause service accuracy | 0.333 |
-| Fault-type accuracy | 0.333 |
-| Joint service and fault accuracy | 0.250 |
-| Valid evidence rate | 0.417 |
-| Average tool calls | 3.833 |
-| Average latency | 26.710 s |
+| Completion rate | 0.917 |
+| Root-cause service accuracy | 0.917 |
+| Fault-type accuracy | 0.583 |
+| Joint service and fault accuracy | 0.583 |
+| Valid evidence rate | 0.917 |
+| Average tool calls | 10.333 |
+| Average latency | 53.509 s |
 
-The agent performs well on the selected CPU cases but often ends an investigation without collecting evidence for harder fault types. This external baseline exposes the main improvement target: more reliable tool use and evidence collection across delay, packet-loss, memory and socket incidents.
+The evidence fallback raised completion from 0.417 to 0.917 and service accuracy from 0.333 to 0.917. Fault-type classification remains the main improvement target, particularly for packet-loss and memory incidents. One case failed because the local model returned malformed structured output.
 
 ## Tests
 
@@ -302,9 +303,8 @@ The copilot produces recommendations but does not execute remediation commands. 
 
 ## Roadmap
 
-1. Improve external-case tool use and evidence collection, especially for memory, packet-loss and socket faults.
-2. Improve required evidence recall through stronger evidence selection.
-3. Expose investigations through a FastAPI service.
+1. Improve fault-type classification and required evidence recall.
+2. Add a bounded retry for malformed structured model output.
 3. Add FastAPI endpoints for starting and retrieving investigations.
 4. Add LangSmith or OpenTelemetry tracing.
 5. Add checkpointing and human approval before remediation.

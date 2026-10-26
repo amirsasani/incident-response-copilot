@@ -94,6 +94,22 @@ def create_summary(item: dict, evidence_type: str) -> str:
     return item.get("title", "Runbook evidence.")
 
 
+def create_evidence(item: dict, evidence_type: str, source: str) -> Evidence | None:
+    evidence_id = item.get("evidence_id")
+
+    if not evidence_id:
+        return None
+
+    return Evidence(
+        evidence_id=evidence_id,
+        evidence_type=evidence_type,
+        source=item.get("service") or item.get("source") or source,
+        summary=create_summary(item, evidence_type),
+        timestamp=item.get("timestamp") or item.get("deployed_at"),
+        metadata=item,
+    )
+
+
 def collect_evidence_node(state: IncidentState) -> dict:
     recent_tool_messages = []
 
@@ -123,24 +139,61 @@ def collect_evidence_node(state: IncidentState) -> dict:
             continue
 
         for item in results:
-            evidence_id = item.get("evidence_id")
+            evidence = create_evidence(item, evidence_type, message.name)
 
-            if not evidence_id:
+            if evidence is None:
                 continue
 
-            collected[evidence_id] = Evidence(
-                evidence_id=evidence_id,
-                evidence_type=evidence_type,
-                source=item.get("service") or item.get("source") or message.name,
-                summary=create_summary(item, evidence_type),
-                timestamp=item.get("timestamp") or item.get("deployed_at"),
-                metadata=item,
-            )
+            collected[evidence.evidence_id] = evidence
 
     return {
         "collected_evidence": list(collected.values()),
         "tool_call_count": state["tool_call_count"] + len(recent_tool_messages),
     }
+
+
+def fallback_evidence_node(state: IncidentState) -> dict:
+    incident = state["incident"]
+    incident_id = state["incident_id"]
+    evidence_sources = incident.get("available_evidence", DEFAULT_EVIDENCE_SOURCES)
+    query = " ".join([incident.get("title", ""), incident.get("service", ""), *incident.get("symptoms", [])]).strip()
+    tool_requests = {
+        "logs": (search_logs, {"incident_id": incident_id, "limit": 20}, "log"),
+        "metrics": (get_metrics, {"incident_id": incident_id, "limit": 20}, "metric"),
+        "traces": (search_traces, {"incident_id": incident_id, "limit": 20}, "trace"),
+        "deployments": (get_recent_deployments, {"service": incident.get("service", ""), "before": incident.get("started_at"), "limit": 5}, "deployment"),
+        "runbooks": (search_runbooks, {"query": query, "limit": 5}, "runbook"),
+    }
+    collected = {evidence.evidence_id: evidence for evidence in state["collected_evidence"]}
+    errors = list(state["errors"])
+    tool_call_count = state["tool_call_count"]
+
+    for source in evidence_sources:
+        request = tool_requests.get(source)
+
+        if request is None:
+            errors.append(f"Unsupported fallback evidence source: {source}")
+            continue
+
+        tool, arguments, evidence_type = request
+        tool_call_count += 1
+
+        try:
+            results = tool.invoke(arguments)
+        except Exception as error:
+            errors.append(f"Fallback {source} search failed: {type(error).__name__}: {error}")
+            continue
+
+        for item in results:
+            evidence = create_evidence(item, evidence_type, tool.name)
+
+            if evidence is not None:
+                collected[evidence.evidence_id] = evidence
+
+    if not collected:
+        errors.append("Fallback evidence collection returned no evidence.")
+
+    return {"collected_evidence": list(collected.values()), "tool_call_count": tool_call_count, "errors": errors}
 
 
 def create_report_node(model):
