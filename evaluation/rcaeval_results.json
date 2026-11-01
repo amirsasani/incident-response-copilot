@@ -3,17 +3,15 @@
   "model": "qwen3.5:4b",
   "dataset": "RCAEval RE2-OB",
   "cases_evaluated": 12,
-  "cases_completed": 11,
-  "completion_rate": 0.917,
+  "cases_completed": 12,
+  "completion_rate": 1.0,
   "service_accuracy": 0.917,
-  "fault_accuracy": 0.583,
+  "fault_accuracy": 0.667,
   "joint_accuracy": 0.583,
-  "valid_evidence_rate": 0.917,
-  "average_tool_calls": 10.333,
-  "average_latency_seconds": 53.509,
-  "failures": [
-    "re2ob_recommendationservice_disk_1"
-  ],
+  "valid_evidence_rate": 1.0,
+  "average_tool_calls": 10.833,
+  "average_latency_seconds": 57.59,
+  "failures": [],
   "cases": [
     {
       "case": "re2ob_checkoutservice_cpu_1",
@@ -32,7 +30,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 72.296,
+      "latency_seconds": 73.119,
       "error": null
     },
     {
@@ -52,7 +50,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 30.973,
+      "latency_seconds": 31.411,
       "error": null
     },
     {
@@ -73,7 +71,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 22.63,
+      "latency_seconds": 70.113,
       "error": null
     },
     {
@@ -81,39 +79,49 @@
       "incident_id": "RCAEVAL-RE2OB-PRODUCTCATALOGSERVICE-DELAY-2",
       "status": "completed",
       "expected_service": "productcatalogservice",
-      "actual_service": "productcatalogservice",
-      "service_correct": true,
+      "actual_service": "frontendservice",
+      "service_correct": false,
       "expected_fault": "delay",
-      "actual_root_cause": "Latency anomaly detected in product catalog service due to high request volume and potential downstream dependencies.",
+      "actual_root_cause": "High latency in frontend service operations due to benchmark fault-injection.",
       "fault_correct": true,
-      "joint_correct": true,
+      "joint_correct": false,
       "cited_evidence": [
-        "rcaeval-metric-001",
-        "rcaeval-trace-001"
+        "rcaeval-trace-001",
+        "rcaeval-trace-002",
+        "rcaeval-trace-003",
+        "rcaeval-trace-004",
+        "rcaeval-trace-005",
+        "rcaeval-trace-006",
+        "rcaeval-trace-007",
+        "rcaeval-trace-008",
+        "rcaeval-trace-009",
+        "rcaeval-trace-010"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 12,
-      "latency_seconds": 68.759,
+      "tool_call_count": 9,
+      "latency_seconds": 35.599,
       "error": null
     },
     {
       "case": "re2ob_recommendationservice_disk_1",
       "incident_id": "RCAEVAL-RE2OB-RECOMMENDATIONSERVICE-DISK-1",
-      "status": "failed",
+      "status": "completed",
       "expected_service": "recommendationservice",
-      "actual_service": null,
-      "service_correct": false,
+      "actual_service": "recommendationservice",
+      "service_correct": true,
       "expected_fault": "disk",
-      "actual_root_cause": null,
-      "fault_correct": false,
-      "joint_correct": false,
-      "cited_evidence": [],
+      "actual_root_cause": "Disk I/O saturation",
+      "fault_correct": true,
+      "joint_correct": true,
+      "cited_evidence": [
+        "rcaeval-metric-001"
+      ],
       "invalid_evidence": [],
-      "evidence_valid": false,
-      "tool_call_count": 0,
-      "latency_seconds": 3.176,
-      "error": "ResponseError: XML syntax error on line 9: element <function> closed by </parameter> (status code: -1)"
+      "evidence_valid": true,
+      "tool_call_count": 9,
+      "latency_seconds": 28.319,
+      "error": null
     },
     {
       "case": "re2ob_checkoutservice_disk_2",
@@ -134,7 +142,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 70.304,
+      "latency_seconds": 71.657,
       "error": null
     },
     {
@@ -160,7 +168,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 13,
-      "latency_seconds": 85.838,
+      "latency_seconds": 85.58,
       "error": null
     },
     {
@@ -181,7 +189,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 72.016,
+      "latency_seconds": 73.251,
       "error": null
     },
     {
@@ -201,7 +209,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 40.104,
+      "latency_seconds": 42.511,
       "error": null
     },
     {
@@ -222,7 +230,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 72.659,
+      "latency_seconds": 74.471,
       "error": null
     },
     {
@@ -243,7 +251,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 71.342,
+      "latency_seconds": 70.884,
       "error": null
     },
     {
@@ -263,7 +271,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 32.01,
+      "latency_seconds": 34.162,
       "error": null
     }
   ]

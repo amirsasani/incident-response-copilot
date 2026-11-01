@@ -16,6 +16,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Generate structured incident reports with Ollama
 - [x] Validate report evidence against collected tool results
 - [x] Add deterministic evidence collection when the model skips tool calls
+- [x] Retry malformed structured reports once
 - [x] Add isolated tool and graph tests
 - [x] Add a five-incident labelled evaluation dataset
 - [x] Evaluate root-cause accuracy and evidence recall
@@ -210,15 +211,15 @@ Results from one local run using `qwen3.5:4b`:
 | Metric | Result |
 |---|---:|
 | Cases | 12 |
-| Completion rate | 0.917 |
+| Completion rate | 1.000 |
 | Root-cause service accuracy | 0.917 |
-| Fault-type accuracy | 0.583 |
+| Fault-type accuracy | 0.667 |
 | Joint service and fault accuracy | 0.583 |
-| Valid evidence rate | 0.917 |
-| Average tool calls | 10.333 |
-| Average latency | 53.509 s |
+| Valid evidence rate | 1.000 |
+| Average tool calls | 10.833 |
+| Average latency | 57.590 s |
 
-The evidence fallback raised completion from 0.417 to 0.917 and service accuracy from 0.333 to 0.917. Fault-type classification remains the main improvement target, particularly for packet-loss and memory incidents. One case failed because the local model returned malformed structured output.
+The evidence fallback and bounded structured-output retry raised completion from 0.417 to 1.000 while maintaining valid evidence for every report. Fault-type classification remains the main improvement target, particularly for packet-loss and memory incidents.
 
 ## Tests
 
@@ -304,10 +305,9 @@ The copilot produces recommendations but does not execute remediation commands. 
 ## Roadmap
 
 1. Improve fault-type classification and required evidence recall.
-2. Add a bounded retry for malformed structured model output.
-3. Add FastAPI endpoints for starting and retrieving investigations.
-4. Add LangSmith or OpenTelemetry tracing.
-5. Add checkpointing and human approval before remediation.
+2. Add FastAPI endpoints for starting and retrieving investigations.
+3. Add LangSmith or OpenTelemetry tracing.
+4. Add checkpointing and human approval before remediation.
 
 ## License
 

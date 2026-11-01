@@ -28,6 +28,7 @@ TOOL_EVIDENCE_TYPES = {
 }
 
 DEFAULT_EVIDENCE_SOURCES = ["logs", "metrics", "deployments", "runbooks"]
+REPORT_GENERATION_ATTEMPTS = 2
 
 
 def create_system_prompt(incident: dict) -> str:
@@ -213,10 +214,25 @@ def create_report_node(model):
             HumanMessage(content=json.dumps(context, indent=2)),
         ]
 
-        report = structured_model.invoke(messages)
+        generation_errors = []
 
-        if isinstance(report, dict):
-            report = IncidentReport.model_validate(report)
+        for attempt in range(REPORT_GENERATION_ATTEMPTS):
+            attempt_messages = messages
+
+            if attempt > 0:
+                attempt_messages = [*messages, HumanMessage(content="The previous response could not be parsed. Return only one valid JSON object matching the IncidentReport schema. Do not use XML, Markdown or explanatory text.")]
+
+            try:
+                report = structured_model.invoke(attempt_messages)
+
+                if isinstance(report, dict):
+                    report = IncidentReport.model_validate(report)
+
+                break
+            except Exception as error:
+                generation_errors.append(f"Report generation attempt {attempt + 1} failed: {type(error).__name__}: {error}")
+        else:
+            raise RuntimeError(f"Report generation failed after {REPORT_GENERATION_ATTEMPTS} attempts. {generation_errors[-1]}")
 
         valid_evidence_ids = {evidence.evidence_id for evidence in state["collected_evidence"]}
         invalid_evidence_ids = set(report.evidence) - valid_evidence_ids
@@ -227,6 +243,6 @@ def create_report_node(model):
         if report.incident_id != state["incident_id"]:
             raise ValueError("Report incident ID does not match the investigated incident.")
 
-        return {"report": report}
+        return {"report": report, "errors": [*state["errors"], *generation_errors]}
 
     return generate_report
