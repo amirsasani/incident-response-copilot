@@ -29,6 +29,17 @@ TOOL_EVIDENCE_TYPES = {
 
 DEFAULT_EVIDENCE_SOURCES = ["logs", "metrics", "deployments", "runbooks"]
 REPORT_GENERATION_ATTEMPTS = 2
+FAULT_TYPE_GUIDANCE = """
+Choose exactly one fault_type based on the strongest direct evidence:
+- cpu: processor saturation or abnormal CPU consumption
+- delay: injected or unexplained latency without a more specific resource fault
+- disk: disk capacity, throughput or I/O failure
+- packet_loss: dropped packets, network loss or transport-level drops
+- memory: heap, RSS, out-of-memory or memory exhaustion
+- socket: socket, file-descriptor or connection-capacity exhaustion
+- unknown: none of these categories is directly supported
+Do not infer a specific category from latency alone when direct resource evidence is absent.
+""".strip()
 
 
 def create_system_prompt(incident: dict) -> str:
@@ -210,7 +221,7 @@ def create_report_node(model):
         }
 
         messages = [
-            SystemMessage(content="Generate an incident report using only the supplied evidence. Cite the strongest relevant evidence across the available evidence types and prefer direct diagnostic evidence over generic symptoms. The evidence field must contain only valid evidence IDs from the supplied evidence."),
+            SystemMessage(content=f"Generate an incident report using only the supplied evidence. Cite the strongest relevant evidence across the available evidence types and prefer direct diagnostic evidence over generic symptoms. The evidence field must contain only valid evidence IDs from the supplied evidence.\n\n{FAULT_TYPE_GUIDANCE}"),
             HumanMessage(content=json.dumps(context, indent=2)),
         ]
 

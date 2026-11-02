@@ -7,10 +7,10 @@
   "completion_rate": 1.0,
   "service_accuracy": 0.917,
   "fault_accuracy": 0.667,
-  "joint_accuracy": 0.583,
+  "joint_accuracy": 0.667,
   "valid_evidence_rate": 1.0,
-  "average_tool_calls": 10.833,
-  "average_latency_seconds": 57.59,
+  "average_tool_calls": 10.5,
+  "average_latency_seconds": 56.086,
   "failures": [],
   "cases": [
     {
@@ -21,7 +21,9 @@
       "actual_service": "checkoutservice",
       "service_correct": true,
       "expected_fault": "cpu",
-      "actual_root_cause": "High CPU utilization detected in the checkout service.",
+      "expected_fault_type": "cpu",
+      "actual_fault_type": "cpu",
+      "actual_root_cause": "The checkoutservice experienced a significant spike in CPU utilization, reaching 18.290239 (a 4164.906% increase from baseline), which indicates processor saturation or abnormal CPU consumption.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
@@ -29,8 +31,8 @@
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 12,
-      "latency_seconds": 73.119,
+      "tool_call_count": 9,
+      "latency_seconds": 40.084,
       "error": null
     },
     {
@@ -41,7 +43,9 @@
       "actual_service": "currencyservice",
       "service_correct": true,
       "expected_fault": "cpu",
-      "actual_root_cause": "CPU utilization anomaly",
+      "expected_fault_type": "cpu",
+      "actual_fault_type": "cpu",
+      "actual_root_cause": "The incident is caused by a significant spike in CPU utilization within the currencyservice, which exceeded its baseline and resulted in an anomaly score of 4.595.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
@@ -50,7 +54,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 31.411,
+      "latency_seconds": 36.438,
       "error": null
     },
     {
@@ -61,7 +65,9 @@
       "actual_service": "emailservice",
       "service_correct": true,
       "expected_fault": "delay",
-      "actual_root_cause": "Latency anomaly detected in emailservice latency metrics.",
+      "expected_fault_type": "delay",
+      "actual_fault_type": "delay",
+      "actual_root_cause": "Injected latency anomaly detected in emailservice metrics.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
@@ -71,7 +77,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 70.113,
+      "latency_seconds": 74.795,
       "error": null
     },
     {
@@ -79,28 +85,21 @@
       "incident_id": "RCAEVAL-RE2OB-PRODUCTCATALOGSERVICE-DELAY-2",
       "status": "completed",
       "expected_service": "productcatalogservice",
-      "actual_service": "frontendservice",
-      "service_correct": false,
+      "actual_service": "productcatalogservice",
+      "service_correct": true,
       "expected_fault": "delay",
-      "actual_root_cause": "High latency in frontend service operations due to benchmark fault-injection.",
+      "expected_fault_type": "delay",
+      "actual_fault_type": "delay",
+      "actual_root_cause": "Injected latency anomaly detected in telemetry metrics following a fault-injection event.",
       "fault_correct": true,
-      "joint_correct": false,
+      "joint_correct": true,
       "cited_evidence": [
-        "rcaeval-trace-001",
-        "rcaeval-trace-002",
-        "rcaeval-trace-003",
-        "rcaeval-trace-004",
-        "rcaeval-trace-005",
-        "rcaeval-trace-006",
-        "rcaeval-trace-007",
-        "rcaeval-trace-008",
-        "rcaeval-trace-009",
-        "rcaeval-trace-010"
+        "rcaeval-metric-001"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 9,
-      "latency_seconds": 35.599,
+      "tool_call_count": 12,
+      "latency_seconds": 69.675,
       "error": null
     },
     {
@@ -111,7 +110,9 @@
       "actual_service": "recommendationservice",
       "service_correct": true,
       "expected_fault": "disk",
-      "actual_root_cause": "Disk I/O saturation",
+      "expected_fault_type": "disk",
+      "actual_fault_type": "disk",
+      "actual_root_cause": "Disk I/O saturation detected in the recommendationservice.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
@@ -120,7 +121,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 28.319,
+      "latency_seconds": 29.086,
       "error": null
     },
     {
@@ -128,21 +129,22 @@
       "incident_id": "RCAEVAL-RE2OB-CHECKOUTSERVICE-DISK-2",
       "status": "completed",
       "expected_service": "checkoutservice",
-      "actual_service": "checkoutservice",
-      "service_correct": true,
+      "actual_service": "online-boutique",
+      "service_correct": false,
       "expected_fault": "disk",
-      "actual_root_cause": "Disk I/O saturation causing high latency and memory pressure during checkout operations.",
-      "fault_correct": true,
-      "joint_correct": true,
+      "expected_fault_type": "disk",
+      "actual_fault_type": "delay",
+      "actual_root_cause": "Injected latency observed in the CheckoutService/PlaceOrder operation.",
+      "fault_correct": false,
+      "joint_correct": false,
       "cited_evidence": [
-        "rcaeval-metric-001",
-        "rcaeval-metric-002",
-        "rcaeval-metric-006"
+        "rcaeval-trace-002",
+        "rcaeval-trace-003"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 12,
-      "latency_seconds": 71.657,
+      "tool_call_count": 10,
+      "latency_seconds": 45.107,
       "error": null
     },
     {
@@ -153,22 +155,18 @@
       "actual_service": "currencyservice",
       "service_correct": true,
       "expected_fault": "loss",
-      "actual_root_cause": "High latency and error rate in currency service caused by benchmark fault injection.",
+      "expected_fault_type": "packet_loss",
+      "actual_fault_type": "delay",
+      "actual_root_cause": "Injected latency anomaly detected in currencyservice metrics.",
       "fault_correct": false,
       "joint_correct": false,
       "cited_evidence": [
-        "rcaeval-metric-001",
-        "rcaeval-metric-002",
-        "rcaeval-metric-003",
-        "rcaeval-trace-001",
-        "rcaeval-trace-002",
-        "rcaeval-trace-003",
-        "rcaeval-trace-004"
+        "rcaeval-metric-003"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 13,
-      "latency_seconds": 85.58,
+      "tool_call_count": 9,
+      "latency_seconds": 40.158,
       "error": null
     },
     {
@@ -179,17 +177,19 @@
       "actual_service": "emailservice",
       "service_correct": true,
       "expected_fault": "loss",
-      "actual_root_cause": "Unhealthy upstream connection causing RPC failures in checkout service",
+      "expected_fault_type": "packet_loss",
+      "actual_fault_type": "socket",
+      "actual_root_cause": "The emailservice experienced a socket exhaustion event, evidenced by the metric `emailservice_socket` reaching 6.191401 (a 106% increase over baseline), indicating connection capacity limits were reached.",
       "fault_correct": false,
       "joint_correct": false,
       "cited_evidence": [
         "rcaeval-log-001",
-        "rcaeval-trace-001"
+        "rcaeval-metric-003"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 73.251,
+      "latency_seconds": 76.209,
       "error": null
     },
     {
@@ -200,7 +200,9 @@
       "actual_service": "productcatalogservice",
       "service_correct": true,
       "expected_fault": "mem",
-      "actual_root_cause": "Latency spike in product catalog service caused by benchmark fault injection.",
+      "expected_fault_type": "memory",
+      "actual_fault_type": "delay",
+      "actual_root_cause": "Injected latency anomaly detected in telemetry metrics following a benchmark fault-injection event.",
       "fault_correct": false,
       "joint_correct": false,
       "cited_evidence": [
@@ -209,7 +211,7 @@
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 9,
-      "latency_seconds": 42.511,
+      "latency_seconds": 40.925,
       "error": null
     },
     {
@@ -220,17 +222,18 @@
       "actual_service": "recommendationservice",
       "service_correct": true,
       "expected_fault": "mem",
-      "actual_root_cause": "Memory exhaustion causing high latency and degraded performance.",
+      "expected_fault_type": "memory",
+      "actual_fault_type": "memory",
+      "actual_root_cause": "Memory exhaustion detected in the recommendationservice.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
-        "rcaeval-metric-001",
         "rcaeval-metric-002"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 74.471,
+      "latency_seconds": 73.885,
       "error": null
     },
     {
@@ -241,17 +244,18 @@
       "actual_service": "checkoutservice",
       "service_correct": true,
       "expected_fault": "socket",
-      "actual_root_cause": "High socket file descriptor usage causing resource exhaustion.",
+      "expected_fault_type": "socket",
+      "actual_fault_type": "socket",
+      "actual_root_cause": "The incident is caused by socket exhaustion in the checkoutservice. Direct metric evidence indicates that the number of open sockets reached 22.0957, which represents a 145.508% increase from the baseline of 9.0. This high utilization suggests connection capacity limits were exceeded.",
       "fault_correct": true,
       "joint_correct": true,
       "cited_evidence": [
-        "rcaeval-metric-001",
         "rcaeval-metric-003"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
       "tool_call_count": 12,
-      "latency_seconds": 70.884,
+      "latency_seconds": 73.631,
       "error": null
     },
     {
@@ -262,16 +266,18 @@
       "actual_service": "currencyservice",
       "service_correct": true,
       "expected_fault": "socket",
-      "actual_root_cause": "Latency spike in currencyservice latency-50 metric",
-      "fault_correct": false,
-      "joint_correct": false,
+      "expected_fault_type": "socket",
+      "actual_fault_type": "socket",
+      "actual_root_cause": "The currencyservice experienced a significant increase in socket usage, indicating connection capacity exhaustion or leak.",
+      "fault_correct": true,
+      "joint_correct": true,
       "cited_evidence": [
-        "rcaeval-metric-002"
+        "rcaeval-metric-005"
       ],
       "invalid_evidence": [],
       "evidence_valid": true,
-      "tool_call_count": 9,
-      "latency_seconds": 34.162,
+      "tool_call_count": 11,
+      "latency_seconds": 73.034,
       "error": null
     }
   ]

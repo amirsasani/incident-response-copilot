@@ -3,7 +3,7 @@ from collections import Counter
 import pytest
 
 import src.incidents.storage as storage
-from scripts.evaluate_rcaeval import evaluate, fault_matches, normalize_service
+from scripts.evaluate_rcaeval import evaluate, normalize_expected_fault, normalize_service
 from scripts.import_rcaeval_batch import CASES_FILE, import_cases, load_cases
 from src.agent.state import Evidence, IncidentReport
 
@@ -14,6 +14,7 @@ class FakeGraph:
             "report": IncidentReport(
                 incident_id=initial_state["incident_id"],
                 affected_service="checkout-service",
+                fault_type="cpu",
                 root_cause="Sustained CPU saturation in checkoutservice.",
                 confidence=0.9,
                 evidence=["rcaeval-metric-001"],
@@ -52,18 +53,18 @@ def test_batch_import_validates_imported_labels(tmp_path):
 
 
 @pytest.mark.parametrize(
-    ("fault", "root_cause"),
+    ("fault", "fault_type"),
     [
-        ("cpu", "CPU saturation"),
-        ("delay", "Network latency increased"),
-        ("disk", "Disk I/O saturation"),
-        ("loss", "Network packet loss"),
-        ("mem", "Out of memory failure"),
-        ("socket", "Socket exhaustion"),
+        ("cpu", "cpu"),
+        ("delay", "delay"),
+        ("disk", "disk"),
+        ("loss", "packet_loss"),
+        ("mem", "memory"),
+        ("socket", "socket"),
     ],
 )
-def test_fault_matches_supported_rcaeval_faults(fault, root_cause):
-    assert fault_matches(fault, root_cause) is True
+def test_normalize_expected_fault_maps_supported_rcaeval_faults(fault, fault_type):
+    assert normalize_expected_fault(fault) == fault_type
 
 
 def test_external_evaluation_calculates_service_fault_and_evidence_metrics(tmp_path, monkeypatch):

@@ -17,6 +17,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Validate report evidence against collected tool results
 - [x] Add deterministic evidence collection when the model skips tool calls
 - [x] Retry malformed structured reports once
+- [x] Add structured fault-type classification
 - [x] Add isolated tool and graph tests
 - [x] Add a five-incident labelled evaluation dataset
 - [x] Evaluate root-cause accuracy and evidence recall
@@ -163,6 +164,7 @@ Example output:
 {
   "incident_id": "INC-001",
   "affected_service": "checkout-api",
+  "fault_type": "unknown",
   "root_cause": "Deployment of version 1.8.0 reduced the database connection pool size from 30 to 5.",
   "confidence": 0.9,
   "evidence": [
@@ -214,12 +216,12 @@ Results from one local run using `qwen3.5:4b`:
 | Completion rate | 1.000 |
 | Root-cause service accuracy | 0.917 |
 | Fault-type accuracy | 0.667 |
-| Joint service and fault accuracy | 0.583 |
+| Joint service and fault accuracy | 0.667 |
 | Valid evidence rate | 1.000 |
-| Average tool calls | 10.833 |
-| Average latency | 57.590 s |
+| Average tool calls | 10.500 |
+| Average latency | 56.086 s |
 
-The evidence fallback and bounded structured-output retry raised completion from 0.417 to 1.000 while maintaining valid evidence for every report. Fault-type classification remains the main improvement target, particularly for packet-loss and memory incidents.
+The evidence fallback and bounded structured-output retry raised completion from 0.417 to 1.000 while maintaining valid evidence for every report. Fault accuracy now compares the report's explicit category against the labelled category instead of inferring it from root-cause wording. The model correctly classified 8 of 12 cases; packet-loss and one memory case remain the main weaknesses.
 
 ## Tests
 
@@ -238,6 +240,7 @@ The tests cover:
 - deployment time filtering;
 - runbook retrieval;
 - Pydantic state validation;
+- structured fault-type validation and evaluation;
 - LangGraph tool execution and evidence collection;
 - structured report generation without a live Ollama dependency.
 

@@ -22,6 +22,7 @@ class FakeGraph:
             "report": IncidentReport(
                 incident_id="INC-TEST",
                 affected_service="checkout-api",
+                fault_type="unknown",
                 root_cause="Database connection pool exhaustion after reducing the configured pool size.",
                 confidence=0.9,
                 evidence=["log-test", "metric-test", "deployment-test"],

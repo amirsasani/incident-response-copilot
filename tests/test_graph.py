@@ -53,6 +53,7 @@ class FakeReportModel:
         return IncidentReport(
             incident_id="INC-001",
             affected_service="checkout-api",
+            fault_type="unknown",
             root_cause="Database connection pool exhaustion caused by reducing DB_POOL_MAX_SIZE.",
             confidence=0.95,
             evidence=["log-001", "metric-001", "deployment-001"],
@@ -139,7 +140,7 @@ class FakeRetryReportModel:
         if self.call_count <= self.failures:
             raise ValueError("Malformed structured output.")
 
-        return IncidentReport(incident_id="INC-001", affected_service="checkout-api", root_cause="Database pool exhaustion.", confidence=0.9, evidence=["metric-001"], recommended_actions=["Restore the pool size."])
+        return IncidentReport(incident_id="INC-001", affected_service="checkout-api", fault_type="unknown", root_cause="Database pool exhaustion.", confidence=0.9, evidence=["metric-001"], recommended_actions=["Restore the pool size."])
 
 
 class FakeRetryModel:

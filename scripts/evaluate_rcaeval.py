@@ -12,13 +12,13 @@ from scripts.import_rcaeval_batch import CASES_FILE, load_cases
 
 
 OUTPUT_FILE = PROJECT_ROOT / "evaluation" / "rcaeval_results.json"
-FAULT_TERMS = {
-    "cpu": ("cpu", "processor", "compute"),
-    "delay": ("delay", "latency", "slow"),
-    "disk": ("disk", "storage", "disk i/o", "disk io"),
-    "loss": ("packet loss", "network loss", "dropped packet", "packet drop"),
-    "mem": ("memory", "out of memory", "oom"),
-    "socket": ("socket", "connection exhaustion", "connection failure"),
+EXPECTED_FAULT_TYPES = {
+    "cpu": "cpu",
+    "delay": "delay",
+    "disk": "disk",
+    "loss": "packet_loss",
+    "mem": "memory",
+    "socket": "socket",
 }
 
 
@@ -26,14 +26,13 @@ def normalize_service(value: str) -> str:
     return re.sub(r"[^a-z0-9]", "", value.casefold())
 
 
-def fault_matches(expected_fault: str, root_cause: str) -> bool:
-    normalized_root_cause = root_cause.casefold()
-    terms = FAULT_TERMS.get(expected_fault)
+def normalize_expected_fault(expected_fault: str) -> str:
+    fault_type = EXPECTED_FAULT_TYPES.get(expected_fault)
 
-    if not terms:
+    if fault_type is None:
         raise ValueError(f"Unsupported RCAEval fault type: {expected_fault}")
 
-    return any(term in normalized_root_cause for term in terms)
+    return fault_type
 
 
 def validate_imported_labels(case: dict) -> dict:
@@ -68,7 +67,8 @@ def evaluate_case(graph, case: dict, timeout_seconds: int) -> dict:
         cited_evidence_ids = set(report.evidence)
         invalid_evidence_ids = cited_evidence_ids - collected_evidence_ids
         service_correct = normalize_service(report.affected_service) == normalize_service(case["expected_service"])
-        fault_correct = fault_matches(case["expected_fault"], report.root_cause)
+        expected_fault_type = normalize_expected_fault(case["expected_fault"])
+        fault_correct = report.fault_type == expected_fault_type
 
         return {
             "case": case["case"],
@@ -78,6 +78,8 @@ def evaluate_case(graph, case: dict, timeout_seconds: int) -> dict:
             "actual_service": report.affected_service,
             "service_correct": service_correct,
             "expected_fault": case["expected_fault"],
+            "expected_fault_type": expected_fault_type,
+            "actual_fault_type": report.fault_type,
             "actual_root_cause": report.root_cause,
             "fault_correct": fault_correct,
             "joint_correct": service_correct and fault_correct,
@@ -97,6 +99,8 @@ def evaluate_case(graph, case: dict, timeout_seconds: int) -> dict:
             "actual_service": None,
             "service_correct": False,
             "expected_fault": case["expected_fault"],
+            "expected_fault_type": normalize_expected_fault(case["expected_fault"]),
+            "actual_fault_type": None,
             "actual_root_cause": None,
             "fault_correct": False,
             "joint_correct": False,

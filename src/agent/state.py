@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 
 EvidenceType = Literal["log", "metric", "trace", "deployment", "runbook"]
+FaultType = Literal["cpu", "delay", "disk", "packet_loss", "memory", "socket", "unknown"]
 
 
 class Evidence(BaseModel):
@@ -21,6 +22,7 @@ class Evidence(BaseModel):
 class IncidentReport(BaseModel):
     incident_id: str
     affected_service: str
+    fault_type: FaultType = Field(description="Primary operational fault category supported by the evidence.")
     root_cause: str
     confidence: float = Field(ge=0.0, le=1.0)
     evidence: list[str] = Field(
