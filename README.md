@@ -24,7 +24,7 @@ The project demonstrates how an AI agent can support site reliability and platfo
 - [x] Import and investigate an external RCAEval RE2 case
 - [x] Evaluate a balanced 12-case RCAEval subset
 - [x] Add distributed-trace search
-- [ ] Expose investigations through a FastAPI service
+- [x] Expose investigations through a FastAPI service
 - [ ] Add human approval before remediation actions
 - [ ] Add tracing and workflow observability
 
@@ -92,6 +92,7 @@ incident-response-copilot/
 │   │   └── state.py        # Typed state and report schemas
 │   ├── datasets/
 │   │   └── rcaeval.py      # Download and normalization adapter
+│   ├── api.py               # FastAPI entry point
 │   ├── incidents/
 │   │   └── repository.py   # Incident loader
 │   ├── tools/
@@ -181,6 +182,24 @@ Example output:
 ```
 
 Results can vary between local model runs. Every returned evidence ID is checked against evidence collected during that investigation.
+
+## Run the API
+
+Start the local service:
+
+```bash
+uvicorn src.api:app --reload
+```
+
+Run an investigation:
+
+```bash
+curl -X POST http://127.0.0.1:8000/investigations \
+  -H "Content-Type: application/json" \
+  -d '{"incident_id":"INC-001"}'
+```
+
+Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
 
 ## External RCAEval evaluation
 
@@ -303,14 +322,13 @@ The copilot produces recommendations but does not execute remediation commands. 
 - Retrieval tools operate on local files rather than production observability systems.
 - Small local models may select weaker evidence even when stronger evidence is available.
 - Investigation latency depends on the local model and hardware.
-- The project currently provides a CLI and does not expose an HTTP API or graphical interface.
+- The API is synchronous and intended for a local single-user demo; it has no authentication or persistent job queue.
 
 ## Roadmap
 
 1. Improve fault-type classification and required evidence recall.
-2. Add FastAPI endpoints for starting and retrieving investigations.
-3. Add LangSmith or OpenTelemetry tracing.
-4. Add checkpointing and human approval before remediation.
+2. Add LangSmith or OpenTelemetry tracing.
+3. Add checkpointing and human approval before remediation.
 
 ## License
 
