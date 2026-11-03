@@ -196,10 +196,16 @@ Run an investigation:
 ```bash
 curl -X POST http://127.0.0.1:8000/investigations \
   -H "Content-Type: application/json" \
-  -d '{"incident_id":"INC-001"}'
+  -d '{"incident_id":"INC-005"}'
 ```
 
 Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+
+### API preview
+
+![FastAPI documentation showing the health and investigation endpoints](docs/images/api-docs.png)
+
+![Example evidence-backed investigation response for a disk-exhaustion incident](docs/images/investigation-response.png)
 
 ## External RCAEval evaluation
 
